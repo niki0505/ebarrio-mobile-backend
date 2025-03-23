@@ -31,10 +31,6 @@ router.post("/register", async (req, res) => {
       return res.json({ exists: false });
     }
 
-    if (resident) {
-      return res.json({ exists: true });
-    }
-
     const user = new User({
       username,
       password,
