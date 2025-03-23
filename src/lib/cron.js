@@ -1,3 +1,5 @@
+//FOR RUNNING ON PHYSICAL DEVICES
+
 import cron from "cron";
 import https from "https";
 import axios from "axios";
