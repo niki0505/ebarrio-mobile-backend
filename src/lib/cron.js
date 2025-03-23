@@ -1,13 +1,16 @@
 import cron from "cron";
 import https from "https";
+import axios from "axios";
 
-const job = new cron.CronJob("*/14 * * * * *", function () {
-  https
-    .get("https://ebarrio-mobile-backend.onrender.com", (res) => {
-      if (res.statusCode === 200) console.log("GET request sent successfully");
-      else console.log("GET request failed", res.statusCode);
-    })
-    .on("error", (e) => console.error("Error while sending request", e));
+const job = new cron.CronJob("*/14 * * * * *", async function () {
+  try {
+    const response = await axios.get(
+      "https://ebarrio-mobile-backend.onrender.com"
+    );
+    console.log("GET request success:", response.status);
+  } catch (error) {
+    console.error("GET request failed:", error.message);
+  }
 });
 
 export default job;
