@@ -22,8 +22,8 @@ router.post("/checkresident", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    console.log("Received request body:", req.body);
     const { username, password } = req.body;
+    console.log("Received request body:", req.body);
     if (!username || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }

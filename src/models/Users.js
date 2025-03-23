@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    resID: {
+      type: Number,
+      unique: true,
+    },
   },
   { versionKey: false }
 );
