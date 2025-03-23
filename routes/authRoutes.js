@@ -28,7 +28,7 @@ router.post("/register", async (req, res) => {
     const resident = await Resident.findOne({ firstname, lastname });
 
     if (!resident) {
-      return res.json({ exists: true });
+      return res.json({ exists: false });
     }
 
     const user = new User({
