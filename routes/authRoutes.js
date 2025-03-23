@@ -22,26 +22,33 @@ const router = express.Router();
 
 router.post("/register", async (req, res) => {
   try {
+    console.log("🔵 Received register request with body:", req.body);
     const { firstname, lastname, username, password } = req.body;
     console.log("Received request body:", req.body);
 
+    console.log("🔍 Checking if resident exists...");
     const resident = await Resident.findOne({ firstname, lastname });
 
     if (!resident) {
+      console.log("❌ Resident not found, returning exists: false");
       return res.json({ exists: false });
+    } else {
+      console.log("✅ Resident found, proceeding with user registration...");
+
+      const user = new User({
+        username,
+        password,
+        resID: resident.resID,
+      });
+
+      await user.save();
+
+      console.log("Sending response:", {
+        message: "User registered successfully. Please log in.",
+        exists: true,
+      });
+      return res.json({ exists: true });
     }
-
-    const user = new User({
-      username,
-      password,
-      resID: resident.resID,
-    });
-
-    await user.save();
-
-    res.status(201).json({
-      message: "User registered successfully. Please log in.",
-    });
   } catch (error) {
     console.log("Error in register route", error);
     res.status(500).json({ message: "Internal server error" });

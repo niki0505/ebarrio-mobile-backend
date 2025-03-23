@@ -8,7 +8,7 @@ import job from "./lib/cron.js";
 
 const app = express();
 
-job.start();
+// job.start();
 app.use(express.json());
 app.use(cors());
 
