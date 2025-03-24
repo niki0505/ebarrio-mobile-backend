@@ -2,24 +2,9 @@ import express from "express";
 import User from "../src/models/Users.js";
 import Resident from "../src/models/Residents.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
-
-// router.post("/checkresident", async (req, res) => {
-//   try {
-//     const { firstname, lastname } = req.body;
-
-//     const resident = await Resident.findOne({ firstname, lastname });
-
-//     if (resident) {
-//       return res.json({ exists: true });
-//     } else {
-//       return res.json({ exists: false });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ message: "Server error", error });
-//   }
-// });
 
 router.post("/register", async (req, res) => {
   try {
@@ -77,8 +62,13 @@ router.post("/login", async (req, res) => {
       return res.json({ exists: true, correctPassword: false });
     }
 
-    console.log("✅ Account found, proceeding with user login...");
-    return res.json({ exists: true, correctPassword: true });
+    console.log("✅ Account found, generating token...");
+    const accessToken = jwt.sign(
+      { accID: user.accID },
+      "mysecret",
+      { expiresIn: "15s" } // Token expires in 1 minutes
+    );
+    return res.json({ exists: true, correctPassword: true, accessToken });
   } catch (error) {}
 });
 
