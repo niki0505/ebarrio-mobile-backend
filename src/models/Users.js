@@ -20,10 +20,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    resID: {
-      type: Number,
-      unique: true,
-    },
+    resID: { type: Number, ref: "Resident", required: true },
+    refreshToken: { type: String },
   },
   { versionKey: false }
 );
