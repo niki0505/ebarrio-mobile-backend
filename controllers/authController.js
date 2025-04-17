@@ -41,7 +41,7 @@ export const refreshAccessToken = (req, res) => {
     const newAccessToken = jwt.sign(
       { userID: decoded.userID },
       process.env.ACCESS_SECRET,
-      { expiresIn: "10s" }
+      { expiresIn: "15m" }
     );
     console.log("New Access Token:", newAccessToken);
     res.json({ accessToken: newAccessToken });
@@ -161,7 +161,7 @@ export const loginUser = async (req, res) => {
       { userID: user._id.toString() },
       ACCESS_SECRET,
       {
-        expiresIn: "10s",
+        expiresIn: "15m",
       }
     );
 
@@ -169,7 +169,7 @@ export const loginUser = async (req, res) => {
       { userID: user._id.toString() },
       REFRESH_SECRET,
       {
-        expiresIn: "20s",
+        expiresIn: "30d",
       }
     );
 
