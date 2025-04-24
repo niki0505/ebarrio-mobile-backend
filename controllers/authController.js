@@ -49,7 +49,7 @@ export const refreshAccessToken = (req, res) => {
           },
           process.env.ACCESS_SECRET,
           {
-            expiresIn: "10s",
+            expiresIn: "15m",
           }
         );
         console.log("Access token refreshed");
@@ -222,7 +222,7 @@ export const loginUser = async (req, res) => {
       },
       ACCESS_SECRET,
       {
-        expiresIn: "10s",
+        expiresIn: "15m",
       }
     );
 
@@ -235,7 +235,7 @@ export const loginUser = async (req, res) => {
       },
       REFRESH_SECRET,
       {
-        expiresIn: "30s",
+        expiresIn: "30d",
       }
     );
 
