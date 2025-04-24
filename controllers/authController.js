@@ -25,29 +25,70 @@ export const sendOTP = async (req, res) => {
   }
 };
 
-// 🔹 Refresh Access token
 export const refreshAccessToken = (req, res) => {
-  const { refreshToken } = req.body; // Assuming the refresh token is in the body
+  const refreshToken = req.header("Authorization")?.split(" ")[1];
 
   if (!refreshToken) {
     return res.status(400).json({ message: "Refresh token is required." });
   }
 
   try {
-    // Verify the refresh token (ensure it's a string)
-    const decoded = jwt.verify(refreshToken, REFRESH_SECRET);
-
-    // Issue new access token here
-    const newAccessToken = jwt.sign(
-      { userID: decoded.userID },
-      process.env.ACCESS_SECRET,
-      { expiresIn: "15m" }
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_SECRET,
+      async (err, decodedRefresh) => {
+        if (err) {
+          return res.status(401).json({ message: "Invalid refresh token" });
+        }
+        const newAccessToken = jwt.sign(
+          {
+            userID: decodedRefresh.userID,
+            role: decodedRefresh.role,
+            name: decodedRefresh.name,
+            picture: decodedRefresh.picture,
+          },
+          process.env.ACCESS_SECRET,
+          {
+            expiresIn: "10s",
+          }
+        );
+        console.log("Access token refreshed");
+        return res.status(200).json({
+          message: "Access token refreshed",
+          accessToken: newAccessToken,
+        });
+      }
     );
-    console.log("New Access Token:", newAccessToken);
-    res.json({ accessToken: newAccessToken });
   } catch (error) {
     console.error("Error verifying refresh token:", error);
     res.status(401).json({ message: "Invalid or expired refresh token." });
+  }
+};
+
+export const checkRefreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    console.log("Got Refresh Token", refreshToken);
+    if (!refreshToken) {
+      return res.status(401).json({ message: "Refresh token not found" });
+    }
+
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_SECRET,
+      async (err, decoded) => {
+        if (err) {
+          return res.status(401).json({ message: "Invalid refresh token" });
+        }
+        return res.status(200).json({
+          message: "Refresh token is still valid",
+          decoded,
+        });
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -138,13 +179,28 @@ export const registerUser = async (req, res) => {
   }
 };
 
+export const logoutUser = async (req, res) => {
+  const { userID } = req.body;
+  try {
+    const user = await User.findById(userID);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    user.status = "Inactive";
+    await user.save();
+
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // 🔹 Log in user
 export const loginUser = async (req, res) => {
   try {
     console.log("🔵 Login request:", req.body);
     const { username, password } = req.body;
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username }).populate("resID");
     if (!user) {
       console.log("❌ Account not found");
       return res.json({ exists: false });
@@ -158,27 +214,39 @@ export const loginUser = async (req, res) => {
 
     console.log("✅ Account found, generating token...");
     const accessToken = jwt.sign(
-      { userID: user._id.toString() },
+      {
+        userID: user._id.toString(),
+        role: user.role,
+        name: `${user.resID.firstname} ${user.resID.lastname}`,
+        picture: user.resID.picture,
+      },
       ACCESS_SECRET,
       {
-        expiresIn: "15m",
+        expiresIn: "10s",
       }
     );
 
     const refreshToken = jwt.sign(
-      { userID: user._id.toString() },
+      {
+        userID: user._id.toString(),
+        role: user.role,
+        name: `${user.resID.firstname} ${user.resID.lastname}`,
+        picture: user.resID.picture,
+      },
       REFRESH_SECRET,
       {
-        expiresIn: "30d",
+        expiresIn: "30s",
       }
     );
+
+    const decoded = jwt.decode(refreshToken);
 
     return res.json({
       exists: true,
       correctPassword: true,
       accessToken,
       refreshToken,
-      user: user.userID,
+      user: decoded,
     });
   } catch (error) {
     console.error("Error in loginUser:", error);
