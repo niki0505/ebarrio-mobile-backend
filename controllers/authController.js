@@ -43,6 +43,7 @@ export const refreshAccessToken = (req, res) => {
         const newAccessToken = jwt.sign(
           {
             userID: decodedRefresh.userID,
+            resID: decodedRefresh.resID,
             role: decodedRefresh.role,
             name: decodedRefresh.name,
             picture: decodedRefresh.picture,
@@ -216,6 +217,7 @@ export const loginUser = async (req, res) => {
     const accessToken = jwt.sign(
       {
         userID: user._id.toString(),
+        resID: user.resID._id.toString(),
         role: user.role,
         name: `${user.resID.firstname} ${user.resID.lastname}`,
         picture: user.resID.picture,
@@ -229,6 +231,7 @@ export const loginUser = async (req, res) => {
     const refreshToken = jwt.sign(
       {
         userID: user._id.toString(),
+        resID: user.resID._id.toString(),
         role: user.role,
         name: `${user.resID.firstname} ${user.resID.lastname}`,
         picture: user.resID.picture,
