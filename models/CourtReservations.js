@@ -11,8 +11,12 @@ const crSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    datetime: {
-      type: String,
+    starttime: {
+      type: Date,
+      required: true,
+    },
+    endtime: {
+      type: Date,
       required: true,
     },
     amount: {
