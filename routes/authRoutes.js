@@ -11,7 +11,8 @@ import {
 } from "../controllers/authController.js";
 import { getUserDetails } from "../controllers/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
-import { sendCertReq } from "../controllers/formController.js";
+import { sendCertReq } from "../controllers/certificateController.js";
+import { getEmergencyHotlines } from "../controllers/emergencyHotlines.js";
 
 const router = express.Router();
 
@@ -28,5 +29,8 @@ router.get("/userdetails", authMiddleware, getUserDetails);
 
 //Certificate Requests
 router.post("/sendcertrequest", authMiddleware, sendCertReq);
+
+//Emergency Hotlines
+router.get("/getemergencyhotlines", authMiddleware, getEmergencyHotlines);
 
 export default router;
