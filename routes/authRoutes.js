@@ -39,7 +39,7 @@ router.post("/sendcertrequest", authMiddleware, sendCertReq);
 
 //Court Reservations
 router.post("/sendreservationrequest", authMiddleware, sendReservationReq);
-router.post("/getreservations", authMiddleware, getReservations);
+router.get("/getreservations", authMiddleware, getReservations);
 
 //Blotter Reports
 router.post("/sendblotter", authMiddleware, sendBlotter);
