@@ -16,6 +16,7 @@ import { getEmergencyHotlines } from "../controllers/emergencyHotlines.js";
 import { sendReservationReq } from "../controllers/courtCountroller.js";
 import { sendBlotter } from "../controllers/blotterController.js";
 import { getWeather } from "../controllers/weatherController.js";
+import { getAllResidents } from "../controllers/residentsController.js";
 
 const router = express.Router();
 
@@ -44,5 +45,8 @@ router.get("/getemergencyhotlines", authMiddleware, getEmergencyHotlines);
 
 //WEATHER
 router.get("/getweather", getWeather);
+
+//RESIDENTS
+router.get("/getresidents", getAllResidents);
 
 export default router;

@@ -1,7 +1,37 @@
 import mongoose from "mongoose";
+import moment from "moment";
 
 const resSchema = new mongoose.Schema(
   {
+    brgyID: [
+      {
+        _id: false,
+        idNumber: {
+          type: String,
+          required: true,
+        },
+        expirationDate: {
+          type: String,
+          required: true,
+        },
+        qrCode: {
+          type: String,
+          required: true,
+        },
+        qrToken: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    picture: {
+      type: String,
+      required: true,
+    },
+    signature: {
+      type: String,
+      required: true,
+    },
     firstname: {
       type: String,
       required: true,
@@ -33,6 +63,10 @@ const resSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    age: {
+      type: Number,
+      required: true,
+    },
     birthplace: {
       type: String,
     },
@@ -51,6 +85,9 @@ const resSchema = new mongoose.Schema(
       required: true,
     },
     voter: {
+      type: String,
+    },
+    precinct: {
       type: String,
     },
     deceased: {
@@ -85,6 +122,21 @@ const resSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    mother: { type: mongoose.Schema.Types.ObjectId, ref: "Resident" },
+    father: { type: mongoose.Schema.Types.ObjectId, ref: "Resident" },
+    spouse: { type: mongoose.Schema.Types.ObjectId, ref: "Resident" },
+    siblings: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Resident",
+      },
+    ],
+    children: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Resident",
+      },
+    ],
     HOAname: {
       type: String,
     },
@@ -107,10 +159,14 @@ const resSchema = new mongoose.Schema(
       type: String,
     },
     userID: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    empID: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
   },
   { versionKey: false }
 );
 
+resSchema.methods.updateAge = function () {
+  this.age = moment().diff(moment(this.birthdate), "years");
+};
 const Resident = mongoose.model("Resident", resSchema);
 
 export default Resident;
