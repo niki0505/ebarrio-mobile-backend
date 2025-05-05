@@ -5,9 +5,9 @@ import mongoose from "mongoose";
 
 export const sendBlotter = async (req, res) => {
   try {
-    const { blotterForm } = req.body;
+    const { updatedForm } = req.body;
     const blotter = new Blotter({
-      ...blotterForm,
+      ...updatedForm,
     });
     await blotter.save();
     return res.status(200).json({ message: "Blotter submitted successfully!" });
