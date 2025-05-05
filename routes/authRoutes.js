@@ -13,7 +13,10 @@ import { getUserDetails } from "../controllers/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import { sendCertReq } from "../controllers/certificateController.js";
 import { getEmergencyHotlines } from "../controllers/emergencyHotlines.js";
-import { sendReservationReq } from "../controllers/courtCountroller.js";
+import {
+  getReservations,
+  sendReservationReq,
+} from "../controllers/courtCountroller.js";
 import { sendBlotter } from "../controllers/blotterController.js";
 import { getWeather } from "../controllers/weatherController.js";
 import { getAllResidents } from "../controllers/residentsController.js";
@@ -36,6 +39,7 @@ router.post("/sendcertrequest", authMiddleware, sendCertReq);
 
 //Court Reservations
 router.post("/sendreservationrequest", authMiddleware, sendReservationReq);
+router.post("/getreservations", authMiddleware, getReservations);
 
 //Blotter Reports
 router.post("/sendblotter", authMiddleware, sendBlotter);

@@ -3,6 +3,16 @@ import Resident from "../models/Residents.js";
 import CourtReservation from "../models/CourtReservations.js";
 import mongoose from "mongoose";
 
+export const getReservations = async (req, res) => {
+  try {
+    const reservation = await CourtReservation.find().populate("resID");
+    return res.status(200).json(reservation);
+  } catch (error) {
+    console.error("Error in fetching court reservations:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const sendReservationReq = async (req, res) => {
   try {
     const { reservationForm } = req.body;
