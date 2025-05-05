@@ -1,4 +1,5 @@
 import Resident from "../models/Residents.js";
+import Employee from "../models/Employees.js";
 
 export const getAllResidents = async (req, res) => {
   try {
