@@ -61,12 +61,12 @@ router.get("/getresidents", getAllResidents);
 //Announcements
 router.get("/getannouncements", getAnnouncements);
 router.put(
-  "/heartannouncement:announcementID",
+  "/heartannouncement/:announcementID",
   authMiddleware,
   heartAnnouncement
 );
 router.put(
-  "/unheartannouncement:announcementID",
+  "/unheartannouncement/:announcementID",
   authMiddleware,
   unheartAnnouncement
 );
