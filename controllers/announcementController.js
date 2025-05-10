@@ -8,7 +8,7 @@ export const unheartAnnouncement = async (req, res) => {
 
     announcement.hearts = announcement.hearts - 1;
     announcement.heartedby = announcement.heartedby.filter(
-      (id) => id !== userID
+      (id) => !id.equals(userID)
     );
 
     await announcement.save();
