@@ -60,7 +60,15 @@ router.get("/getresidents", getAllResidents);
 
 //Announcements
 router.get("/getannouncements", getAnnouncements);
-router.put("/heartannouncement", authMiddleware, heartAnnouncement);
-router.put("/unheartannouncement", authMiddleware, unheartAnnouncement);
+router.put(
+  "/heartannouncement:announcementID",
+  authMiddleware,
+  heartAnnouncement
+);
+router.put(
+  "/unheartannouncement:announcementID",
+  authMiddleware,
+  unheartAnnouncement
+);
 
 export default router;
