@@ -20,6 +20,11 @@ import {
 import { sendBlotter } from "../controllers/blotterController.js";
 import { getWeather } from "../controllers/weatherController.js";
 import { getAllResidents } from "../controllers/residentsController.js";
+import {
+  getAnnouncements,
+  heartAnnouncement,
+  unheartAnnouncement,
+} from "../controllers/announcementController.js";
 
 const router = express.Router();
 
@@ -52,5 +57,10 @@ router.get("/getweather", getWeather);
 
 //RESIDENTS
 router.get("/getresidents", getAllResidents);
+
+//Announcements
+router.get("/getannouncements", getAnnouncements);
+router.put("/heartannouncement", authMiddleware, heartAnnouncement);
+router.put("/unheartannouncement", authMiddleware, unheartAnnouncement);
 
 export default router;
