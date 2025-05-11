@@ -5,9 +5,9 @@ import {
   loginUser,
   refreshAccessToken,
   sendOTP,
-  checkUsername,
   checkRefreshToken,
   logoutUser,
+  verifyOTP,
 } from "../controllers/authController.js";
 import { getUserDetails } from "../controllers/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -31,25 +31,28 @@ const router = express.Router();
 router.post("/refresh", refreshAccessToken);
 router.post("/checkresident", checkResident);
 router.post("/register", registerUser);
-router.post("/checkusername", checkUsername);
+// router.post("/checkusername", checkUsername);
 router.post("/login", loginUser);
-router.post("/otp", sendOTP);
 router.post("/checkrefreshtoken", checkRefreshToken);
 router.get("/refreshtoken", refreshAccessToken);
 router.post("/logout", logoutUser);
 router.get("/userdetails", authMiddleware, getUserDetails);
 
-//Certificate Requests
+//OTP
+router.post("/sendotp", sendOTP);
+router.post("/verifyotp", verifyOTP);
+
+//CERTIFICATE REQUESTS
 router.post("/sendcertrequest", authMiddleware, sendCertReq);
 
-//Court Reservations
+//COURT RESERVATIONS
 router.post("/sendreservationrequest", authMiddleware, sendReservationReq);
 router.get("/getreservations", authMiddleware, getReservations);
 
-//Blotter Reports
+//BLOTTER REPORTS
 router.post("/sendblotter", authMiddleware, sendBlotter);
 
-//Emergency Hotlines
+//EMERGENCY HOTLINES
 router.get("/getemergencyhotlines", authMiddleware, getEmergencyHotlines);
 
 //WEATHER
@@ -58,7 +61,7 @@ router.get("/getweather", getWeather);
 //RESIDENTS
 router.get("/getresidents", getAllResidents);
 
-//Announcements
+//ANNOUNCEMENTS
 router.get("/getannouncements", getAnnouncements);
 router.put(
   "/heartannouncement/:announcementID",

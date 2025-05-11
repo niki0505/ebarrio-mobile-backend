@@ -39,7 +39,7 @@ export const heartAnnouncement = async (req, res) => {
 export const getAnnouncements = async (req, res) => {
   try {
     const announcements = await Announcement.find().select(
-      "hearts category title content status picture uploadedby heartedby"
+      "hearts category title content status picture uploadedby heartedby createdAt"
     );
 
     const formattedAnnouncement = announcements.map((a) => ({

@@ -4,21 +4,51 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { configDotenv } from "dotenv";
 import axios from "axios";
+import { rds } from "../index.js";
 
 configDotenv();
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
 
+export const verifyOTP = async (req, res) => {
+  try {
+    const { username, OTP } = req.body;
+
+    rds.get(`username_${username}`, (err, storedOTP) => {
+      if (err) {
+        console.error("Error retrieving OTP from Redis:", err);
+        return res.status(500).json({ message: "Failed to verify OTP" });
+      }
+
+      if (!storedOTP) {
+        return res
+          .status(400)
+          .json({ message: "OTP has expired or does not exist" });
+      }
+
+      if (storedOTP === OTP.toString()) {
+        return res.status(200).json({ message: "OTP verified successfully!" });
+      } else {
+        return res.status(400).json({ message: "Invalid OTP" });
+      }
+    });
+  } catch (error) {
+    console.error("Error in sending OTP:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const sendOTP = async (req, res) => {
   try {
-    const { mobilenumber } = req.body;
+    const { username, mobilenumber } = req.body;
     const response = await axios.post("https://api.semaphore.co/api/v4/otp", {
       apikey: "46d791fbe4e880554fcad1ee958bbf33",
       number: mobilenumber,
       message:
         "Your one time password is {otp}. Please use it within 5 minutes.",
     });
-    res.status(200).json({ otp: response.data[0]?.code });
+    rds.setex(`username_${username}`, 300, response.data[0]?.code.toString());
+    res.status(200).json({ message: "OTP sent successfully!" });
   } catch (error) {
     console.error("Error in sending OTP:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -93,76 +123,68 @@ export const checkRefreshToken = async (req, res) => {
   }
 };
 
-// 🔹 Check if resident exists
 export const checkResident = async (req, res) => {
   try {
-    console.log("🔍 Checking if resident exists...", req.body);
     const { firstname, lastname, mobilenumber } = req.body;
 
     const resident = await Resident.findOne({
       firstname,
       lastname,
       mobilenumber,
+      empID: { $exists: false },
     });
 
     if (!resident) {
-      console.log("❌ Resident not found");
-      return res.json({ exists: false });
+      return res.status(404).json({ message: "Resident not found" });
     }
 
-    console.log("✅ Resident found");
     if (resident.userID && resident) {
-      console.log("❌ Resident already have an account");
-      return res.json({ hasAccount: true, exists: true });
+      return res
+        .status(409)
+        .json({ message: "Resident already has an account" });
     }
 
-    return res.json({
-      exists: true,
+    return res.status(200).json({
+      message: "Resident found",
       resID: resident._id,
-      hasAccount: false,
     });
   } catch (error) {
-    console.error("Error in checkResident:", error);
+    console.error("Error in checking resident:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-// 🔹 Check if username is taken
-export const checkUsername = async (req, res) => {
-  try {
-    console.log("🔍 Checking if username exists...", req.body);
-    const { username } = req.body;
+// // 🔹 Check if username is taken
+// export const checkUsername = async (req, res) => {
+//   try {
+//     const { username } = req.body;
 
-    const user = await User.findOne({ username });
+//     const user = await User.findOne({ username });
 
-    if (user) {
-      console.log("❌ Username is already taken");
-      return res.json({ usernameExists: true });
-    }
+//     if (user) {
+//       return res.status(409).json({ message: "Username already exists" });
+//     }
 
-    console.log("✅ Username is not found");
-    return res.json({ usernameExists: false });
-  } catch (error) {
-    console.error("Error in checkResident:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+//     return res.status(200).json({ message: "Username do not exist" });
+//   } catch (error) {
+//     console.error("Error in checking username:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
 
-// 🔹 Register a new user
 export const registerUser = async (req, res) => {
   try {
-    console.log("🔵 Register request:", req.body);
     const { username, password, resID } = req.body;
 
-    const usernameExists = await User.findOne({ username });
-    if (usernameExists) {
-      console.log("❌ Username already exists");
-      return res.json({ usernameExists: true });
+    let user = await User.findOne({ username });
+
+    if (user) {
+      return res.status(409).json({ message: "Username already exists" });
     }
 
     const resident = await Resident.findOne({ _id: resID });
 
-    const user = new User({
+    user = new User({
       username,
       password,
       resID,
@@ -171,11 +193,11 @@ export const registerUser = async (req, res) => {
     await user.save();
 
     resident.userID = user._id;
+
     await resident.save();
-    console.log("✅ User registered successfully");
-    return res.json({ exists: true, message: "User registered successfully" });
+    return res.status(200).json({ message: "User registered successfully" });
   } catch (error) {
-    console.error("Error in registerUser:", error);
+    console.error("Error in registering user:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -195,25 +217,21 @@ export const logoutUser = async (req, res) => {
   }
 };
 
-// 🔹 Log in user
 export const loginUser = async (req, res) => {
   try {
-    console.log("🔵 Login request:", req.body);
     const { username, password } = req.body;
 
     const user = await User.findOne({ username }).populate("resID");
+
     if (!user) {
-      console.log("❌ Account not found");
-      return res.json({ exists: false });
+      return res.status(404).json({ message: "Account not found" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log("❌ Incorrect Password");
-      return res.json({ exists: true, correctPassword: false });
+      return res.status(409).json({ message: "Incorrect Password" });
     }
 
-    console.log("✅ Account found, generating token...");
     const accessToken = jwt.sign(
       {
         userID: user._id.toString(),
@@ -244,15 +262,14 @@ export const loginUser = async (req, res) => {
 
     const decoded = jwt.decode(refreshToken);
 
-    return res.json({
-      exists: true,
-      correctPassword: true,
+    return res.status(200).json({
+      message: "User logged in successfully",
       accessToken,
       refreshToken,
       user: decoded,
     });
   } catch (error) {
-    console.error("Error in loginUser:", error);
+    console.error("Error in logging in:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
