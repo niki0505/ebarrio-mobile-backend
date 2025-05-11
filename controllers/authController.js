@@ -125,7 +125,7 @@ export const checkRefreshToken = async (req, res) => {
 
 export const checkResident = async (req, res) => {
   try {
-    const { firstname, lastname, mobilenumber } = req.body;
+    const { username, firstname, lastname, mobilenumber } = req.body;
 
     const resident = await Resident.findOne({
       firstname,
@@ -142,6 +142,12 @@ export const checkResident = async (req, res) => {
       return res
         .status(409)
         .json({ message: "Resident already has an account" });
+    }
+
+    const user = await User.findOne({ username });
+
+    if (user) {
+      return res.status(409).json({ message: "Username already exists" });
     }
 
     return res.status(200).json({
@@ -176,15 +182,9 @@ export const registerUser = async (req, res) => {
   try {
     const { username, password, resID } = req.body;
 
-    let user = await User.findOne({ username });
-
-    if (user) {
-      return res.status(409).json({ message: "Username already exists" });
-    }
-
     const resident = await Resident.findOne({ _id: resID });
 
-    user = new User({
+    const user = new User({
       username,
       password,
       resID,
