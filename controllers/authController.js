@@ -180,7 +180,7 @@ export const checkResident = async (req, res) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { username, password, resID } = req.body;
+    const { username, password, resID, securityquestions } = req.body;
 
     const resident = await Resident.findOne({ _id: resID });
 
@@ -188,6 +188,7 @@ export const registerUser = async (req, res) => {
       username,
       password,
       resID,
+      securityquestions,
     });
 
     await user.save();
