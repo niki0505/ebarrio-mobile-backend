@@ -10,6 +10,37 @@ configDotenv();
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
 
+export const getMobileNumber = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const user = await User.findOne({ username: username })
+      .populate({
+        path: "empID",
+        select: "resID",
+        populate: {
+          path: "resID",
+          select: "mobilenumber",
+        },
+      })
+      .populate({
+        path: "resID",
+        select: "mobilenumber",
+      });
+
+    if (!user) {
+      return res.status(404).json({ message: "Username not found!" });
+    }
+
+    return res.status(200).json({
+      mobilenumber: user.empID?.resID.mobilenumber || user.resID?.mobilenumber,
+    });
+  } catch (error) {
+    console.error("Error in sending OTP:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const verifyOTP = async (req, res) => {
   try {
     const { username, OTP } = req.body;
@@ -159,24 +190,6 @@ export const checkResident = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-// // 🔹 Check if username is taken
-// export const checkUsername = async (req, res) => {
-//   try {
-//     const { username } = req.body;
-
-//     const user = await User.findOne({ username });
-
-//     if (user) {
-//       return res.status(409).json({ message: "Username already exists" });
-//     }
-
-//     return res.status(200).json({ message: "Username do not exist" });
-//   } catch (error) {
-//     console.error("Error in checking username:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
 
 export const registerUser = async (req, res) => {
   try {

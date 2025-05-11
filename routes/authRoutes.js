@@ -8,6 +8,7 @@ import {
   checkRefreshToken,
   logoutUser,
   verifyOTP,
+  getMobileNumber,
 } from "../controllers/authController.js";
 import { getUserDetails } from "../controllers/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -33,6 +34,7 @@ router.post("/checkresident", checkResident);
 router.post("/register", registerUser);
 // router.post("/checkusername", checkUsername);
 router.post("/login", loginUser);
+router.post("/getmobilenumber/:username", getMobileNumber);
 router.post("/checkrefreshtoken", checkRefreshToken);
 router.get("/refreshtoken", refreshAccessToken);
 router.post("/logout", logoutUser);
