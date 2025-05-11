@@ -11,9 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: "*" }));
 
-const rds = new Redis(
-  "rediss://default:8371acac08424457a591b90d01c5a45c@gusc1-trusting-akita-31569.upstash.io:6379"
-);
+const rds = new Redis(process.env.REDIS_URL);
 
 export { rds };
 
