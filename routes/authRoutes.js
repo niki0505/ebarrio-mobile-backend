@@ -34,7 +34,7 @@ router.post("/checkresident", checkResident);
 router.post("/register", registerUser);
 // router.post("/checkusername", checkUsername);
 router.post("/login", loginUser);
-router.post("/getmobilenumber/:username", getMobileNumber);
+router.get("/getmobilenumber/:username", getMobileNumber);
 router.post("/checkrefreshtoken", checkRefreshToken);
 router.get("/refreshtoken", refreshAccessToken);
 router.post("/logout", logoutUser);
