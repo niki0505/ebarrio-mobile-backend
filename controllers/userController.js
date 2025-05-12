@@ -4,20 +4,17 @@ import Resident from "../models/Residents.js";
 export const getUserDetails = async (req, res) => {
   try {
     let user = await User.findOne({ _id: req.user.userID })
-      .select("username role securityquestions")
+      .select("username role securityquestions empID resID")
       .populate({
         path: "empID",
         populate: {
           path: "resID",
         },
-      });
+      })
+      .populate("resID");
 
     if (!user) {
       return res.json({ message: "Account not found" });
-    }
-
-    if (!user.empID) {
-      user = await User.populate(user, { path: "resID" });
     }
 
     const filteredUser = {
@@ -27,7 +24,7 @@ export const getUserDetails = async (req, res) => {
         question: q.question,
       })),
       empID: user.empID || undefined,
-      resID: user.empID ? undefined : user.resID,
+      resID: user.empID ? undefined : user.resID || undefined,
     };
 
     return res.status(200).json(filteredUser);
