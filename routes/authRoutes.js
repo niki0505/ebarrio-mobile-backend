@@ -39,6 +39,7 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/getmobilenumber/:username", getMobileNumber);
 router.post("/checkcredentials", checkCredentials);
+router.get("/getuserdetails", authMiddleware, checkCredentials);
 
 router.post("/checkrefreshtoken", checkRefreshToken);
 router.get("/refreshtoken", refreshAccessToken);
