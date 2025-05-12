@@ -39,12 +39,11 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/getmobilenumber/:username", getMobileNumber);
 router.post("/checkcredentials", checkCredentials);
-router.get("/getuserdetails", authMiddleware, checkCredentials);
+router.get("/getuserdetails", authMiddleware, getUserDetails);
 
 router.post("/checkrefreshtoken", checkRefreshToken);
 router.get("/refreshtoken", refreshAccessToken);
 router.post("/logout", logoutUser);
-router.get("/userdetails", authMiddleware, getUserDetails);
 
 //OTP
 router.post("/sendotp", sendOTP);
