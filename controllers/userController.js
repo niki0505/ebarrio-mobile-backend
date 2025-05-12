@@ -3,7 +3,7 @@ import Resident from "../models/Residents.js";
 
 export const getUserDetails = async (req, res) => {
   try {
-    let user = await User.findOne({ _id: req.userID })
+    let user = await User.findOne({ _id: req.user.userID })
       .select("username role securityquestions")
       .populate({
         path: "empID",
