@@ -27,6 +27,18 @@ import {
   heartAnnouncement,
   unheartAnnouncement,
 } from "../controllers/announcementController.js";
+import {
+  changePassword,
+  changeSecurityQuestions,
+  changeUsername,
+} from "../controllers/settingsController.js";
+import {
+  checkOTP,
+  checkUser,
+  limitOTP,
+  newPassword,
+  verifySecurityQuestion,
+} from "../controllers/forgotPassController.js";
 
 const router = express.Router();
 
@@ -44,6 +56,13 @@ router.get("/getuserdetails", authMiddleware, getUserDetails);
 router.post("/checkrefreshtoken", checkRefreshToken);
 router.get("/refreshtoken", refreshAccessToken);
 router.post("/logout", logoutUser);
+
+//FORGOT PASSWORD
+router.get("/checkuser/:username", checkUser);
+router.post("/verifyquestion/:username", verifySecurityQuestion);
+router.post("/newpassword/:username", newPassword);
+router.get("/limitotp/:username", limitOTP);
+router.get("/checkotp/:username", checkOTP);
 
 //OTP
 router.post("/sendotp", sendOTP);
@@ -80,5 +99,10 @@ router.put(
   authMiddleware,
   unheartAnnouncement
 );
+
+//ACCOUNT SETTINGS
+router.put("/changeusername", authMiddleware, changeUsername);
+router.put("/changepassword", authMiddleware, changePassword);
+router.put("/changesecurityquestions", authMiddleware, changeSecurityQuestions);
 
 export default router;
