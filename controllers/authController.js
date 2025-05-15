@@ -307,7 +307,7 @@ export const loginUser = async (req, res) => {
     const accessToken = jwt.sign(
       {
         userID: user._id.toString(),
-        resID: user.resID._id.toString() || user.empID.resID._id,
+        resID: user.resID._id.toString() || user.empID.resID._id.toString(),
         role: user.role,
         name: user.resID.firstname || user.empID.resID.firstname,
         picture: user.resID.picture || user.empID.resID.picture,
@@ -321,7 +321,7 @@ export const loginUser = async (req, res) => {
     const refreshToken = jwt.sign(
       {
         userID: user._id.toString(),
-        resID: user.resID._id.toString() || user.empID.resID._id,
+        resID: user.resID._id.toString() || user.empID.resID._id.toString(),
         role: user.role,
         name: user.resID.firstname || user.empID.resID.firstname,
         picture: user.resID.picture || user.empID.resID.picture,
