@@ -12,7 +12,10 @@ import {
   checkCredentials,
   checkUsername,
 } from "../controllers/authController.js";
-import { getUserDetails } from "../controllers/userController.js";
+import {
+  getUserDetails,
+  resetPassword,
+} from "../controllers/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import { sendCertReq } from "../controllers/certificateController.js";
 import { getEmergencyHotlines } from "../controllers/emergencyHotlines.js";
@@ -64,6 +67,9 @@ router.post("/verifyquestion/:username", verifySecurityQuestion);
 router.post("/newpassword/:username", newPassword);
 router.get("/limitotp/:username", limitOTP);
 router.get("/checkotp/:username", checkOTP);
+
+//USERS
+router.put("/resetpassword/:username", resetPassword);
 
 //OTP
 router.post("/sendotp", sendOTP);
