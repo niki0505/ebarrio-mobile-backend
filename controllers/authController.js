@@ -294,15 +294,23 @@ export const loginUser = async (req, res) => {
   try {
     const { username } = req.body;
 
-    const user = await User.findOne({ username }).populate("resID");
+    const user = await User.findOne({ username })
+      .select("empID resID")
+      .populate({
+        path: "empID",
+        populate: {
+          path: "resID",
+        },
+      })
+      .populate("resID");
 
     const accessToken = jwt.sign(
       {
         userID: user._id.toString(),
-        // resID: user.resID._id.toString(),
-        // role: user.role,
-        // name: `${user.resID.firstname} ${user.resID.lastname}`,
-        // picture: user.resID.picture,
+        resID: user.resID._id.toString() || user.empID.resID._id,
+        role: user.role,
+        name: user.resID.firstname || user.empID.resID.firstname,
+        picture: user.resID.picture || user.empID.resID.picture,
       },
       ACCESS_SECRET,
       {
@@ -313,10 +321,10 @@ export const loginUser = async (req, res) => {
     const refreshToken = jwt.sign(
       {
         userID: user._id.toString(),
-        // resID: user.resID._id.toString(),
-        // role: user.role,
-        // name: `${user.resID.firstname} ${user.resID.lastname}`,
-        // picture: user.resID.picture,
+        resID: user.resID._id.toString() || user.empID.resID._id,
+        role: user.role,
+        name: user.resID.firstname || user.empID.resID.firstname,
+        picture: user.resID.picture || user.empID.resID.picture,
       },
       REFRESH_SECRET,
       {
