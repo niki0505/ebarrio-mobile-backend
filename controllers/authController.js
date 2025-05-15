@@ -10,6 +10,22 @@ configDotenv();
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
 
+export const checkUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const user = await User.findOne({ username });
+
+    if (user) {
+      return res.status(409).json({ message: "Username is already taken" });
+    }
+    return res.status(200).json({ message: "Username does not exist yet" });
+  } catch (error) {
+    console.error("Error in checking username:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const getMobileNumber = async (req, res) => {
   try {
     const { username } = req.params;

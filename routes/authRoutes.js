@@ -10,6 +10,7 @@ import {
   verifyOTP,
   getMobileNumber,
   checkCredentials,
+  checkUsername,
 } from "../controllers/authController.js";
 import { getUserDetails } from "../controllers/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -101,6 +102,7 @@ router.put(
 );
 
 //ACCOUNT SETTINGS
+router.put("/checkusername/:username", authMiddleware, checkUsername);
 router.put("/changeusername", authMiddleware, changeUsername);
 router.put("/changepassword", authMiddleware, changePassword);
 router.put("/changesecurityquestions", authMiddleware, changeSecurityQuestions);
