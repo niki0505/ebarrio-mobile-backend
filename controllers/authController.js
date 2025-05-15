@@ -295,7 +295,7 @@ export const loginUser = async (req, res) => {
     const { username } = req.body;
 
     const user = await User.findOne({ username })
-      .select("empID resID")
+      .select("empID resID role")
       .populate({
         path: "empID",
         populate: {
