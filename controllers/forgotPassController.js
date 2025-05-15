@@ -94,7 +94,8 @@ export const checkUser = async (req, res) => {
           path: "resID",
           select: "mobilenumber",
         },
-      });
+      })
+      .populate({ path: "resID", select: "mobilenumber" });
 
     if (!user) {
       return res.status(404).json({ message: "User not found!" });
