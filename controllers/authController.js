@@ -304,13 +304,24 @@ export const loginUser = async (req, res) => {
       })
       .populate("resID");
 
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const resID =
+      user?.resID?._id?.toString() || user?.empID?.resID?._id?.toString();
+    const name =
+      user?.resID?.firstname || user?.empID?.resID?.firstname || "Unknown";
+    const picture = user?.resID?.picture || user?.empID?.resID?.picture || null;
+    const role = user?.role;
+
     const accessToken = jwt.sign(
       {
         userID: user._id.toString(),
-        resID: user.resID._id.toString() || user.empID.resID._id.toString(),
-        role: user.role,
-        name: user.resID.firstname || user.empID.resID.firstname,
-        picture: user.resID.picture || user.empID.resID.picture,
+        resID,
+        role,
+        name,
+        picture,
       },
       ACCESS_SECRET,
       {
@@ -321,10 +332,10 @@ export const loginUser = async (req, res) => {
     const refreshToken = jwt.sign(
       {
         userID: user._id.toString(),
-        resID: user.resID._id.toString() || user.empID.resID._id.toString(),
-        role: user.role,
-        name: user.resID.firstname || user.empID.resID.firstname,
-        picture: user.resID.picture || user.empID.resID.picture,
+        resID,
+        role,
+        name,
+        picture,
       },
       REFRESH_SECRET,
       {
