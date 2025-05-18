@@ -1,4 +1,5 @@
 import Announcement from "../models/Announcements.js";
+import { getAnnouncementsUtils } from "../utils/collectionUtils.js";
 
 export const unheartAnnouncement = async (req, res) => {
   try {
@@ -38,14 +39,7 @@ export const heartAnnouncement = async (req, res) => {
 
 export const getAnnouncements = async (req, res) => {
   try {
-    const announcements = await Announcement.find().select(
-      "hearts category title content status picture uploadedby heartedby createdAt eventStart eventEnd status"
-    );
-
-    const formattedAnnouncement = announcements.map((a) => ({
-      ...a.toObject(),
-      uploadedby: "Barangay Aniban 2",
-    }));
+    const formattedAnnouncement = await getAnnouncementsUtils();
     res.status(200).json(formattedAnnouncement);
   } catch (error) {
     console.error("Error in fetching announcements:", error);
