@@ -23,7 +23,6 @@ const io = new Server(server, {
   cors: {
     origin: "*",
   },
-  transports: ["websocket"],
 });
 
 app.set("socketio", io);
@@ -42,7 +41,7 @@ rds.on("error", (err) => {
 });
 
 const PORT = process.env.PORT;
-app.listen(PORT, async () => {
+server.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
   await connectDB();
   watchAllCollectionsChanges(io);
