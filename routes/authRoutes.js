@@ -32,6 +32,7 @@ import {
   unheartAnnouncement,
 } from "../controllers/announcementController.js";
 import {
+  changeMobileNumber,
   changePassword,
   changeSecurityQuestions,
   changeUsername,
@@ -112,6 +113,7 @@ router.put(
 router.get("/checkusername/:username", authMiddleware, checkUsername);
 router.put("/changeusername", authMiddleware, changeUsername);
 router.put("/changepassword", authMiddleware, changePassword);
+router.put("/changemobilenumber", authMiddleware, changeMobileNumber);
 router.put("/changesecurityquestions", authMiddleware, changeSecurityQuestions);
 
 //STATUS
