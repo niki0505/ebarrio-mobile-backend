@@ -7,6 +7,8 @@ import { Server } from "socket.io";
 import http from "http";
 import Redis from "ioredis";
 import { watchAllCollectionsChanges } from "./controllers/watchDB.js";
+import { createAdapter } from "@socket.io/redis-adapter";
+import { registerSocketEvents, connectedUsers } from "./utils/socket.js";
 
 configDotenv();
 
@@ -15,6 +17,7 @@ app.use(express.json());
 app.use(cors({ origin: "*" }));
 
 const rds = new Redis(process.env.REDIS_URL);
+const subClient = rds.duplicate();
 
 export { rds };
 
@@ -24,6 +27,14 @@ const io = new Server(server, {
     origin: "*",
   },
 });
+
+io.on("connection", (socket) => {
+  const { userID, resID } = socket.handshake.query;
+  socket.userID = userID;
+  socket.resID = resID;
+});
+
+io.adapter(createAdapter(rds, subClient));
 
 app.set("socketio", io);
 app.use("/api", authRoutes);
@@ -42,7 +53,21 @@ rds.on("error", (err) => {
 
 const PORT = process.env.PORT;
 server.listen(PORT, async () => {
-  console.log(`Server is running on port ${PORT}`);
-  await connectDB();
-  watchAllCollectionsChanges(io);
+  try {
+    console.log(`Server is running on port ${PORT}`);
+    await connectDB();
+    registerSocketEvents(io);
+    watchAllCollectionsChanges(io);
+
+    //To check the rooms
+    // setInterval(async () => {
+    //   const rooms = await io.of("/").adapter.allRooms();
+    //   const filtered = [...rooms].filter(
+    //     (room) => !io.sockets.sockets.has(room)
+    //   );
+    //   console.log("All custom rooms across nodes:", filtered);
+    // }, 10000);
+  } catch (error) {
+    console.log("Error during startup:", error);
+  }
 });

@@ -2,15 +2,16 @@ import Announcement from "../models/Announcements.js";
 
 export const getAnnouncementsUtils = async () => {
   try {
-    const announcements = await Announcement.find().select(
-      "hearts category title content status picture uploadedby heartedby createdAt eventStart eventEnd status"
-    );
+    const announcements = await Announcement.find().populate({
+      path: "uploadedby",
+      select: "position",
+      populate: {
+        path: "resID",
+        select: "firstname middlename lastname picture",
+      },
+    });
 
-    const formattedAnnouncement = announcements.map((a) => ({
-      ...a.toObject(),
-      uploadedby: "Barangay Aniban 2",
-    }));
-    return formattedAnnouncement;
+    return announcements;
   } catch (error) {
     throw new Error("Error fetching announcements: " + error.message);
   }

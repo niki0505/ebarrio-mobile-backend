@@ -43,6 +43,7 @@ import {
   newPassword,
   verifySecurityQuestion,
 } from "../controllers/forgotPassController.js";
+import { getServicesSubmitted } from "../controllers/statusController.js";
 
 const router = express.Router();
 
@@ -112,5 +113,8 @@ router.get("/checkusername/:username", authMiddleware, checkUsername);
 router.put("/changeusername", authMiddleware, changeUsername);
 router.put("/changepassword", authMiddleware, changePassword);
 router.put("/changesecurityquestions", authMiddleware, changeSecurityQuestions);
+
+//STATUS
+router.get("/getservices/:userID", getServicesSubmitted);
 
 export default router;
