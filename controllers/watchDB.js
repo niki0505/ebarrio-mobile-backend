@@ -91,12 +91,12 @@ export const watchAllCollectionsChanges = (io) => {
         }
 
         const services = await getServicesUtils(userID);
-        io.to(userID).emit("dbChange", {
+        io.in(userID).emit("dbChange", {
           type: "services",
           data: services,
         });
       } else if (change.operationType === "delete") {
-        io.emit("dbChange", {
+        io.in(userID).emit("dbChange", {
           type: "services",
           deleted: true,
           id: change.documentKey._id,
