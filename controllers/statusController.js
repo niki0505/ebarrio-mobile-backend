@@ -3,12 +3,12 @@ import User from "../models/Users.js";
 import Certificate from "../models/Certificates.js";
 import CourtReservation from "../models/CourtReservations.js";
 import Blotter from "../models/Blotters.js";
+import mongoose from "mongoose";
 
 export const getServicesSubmitted = async (req, res) => {
   try {
     const { userID } = req.params;
-    const user = await User.findById(userID);
-    console.log(user.resID);
+    const user = await User.findById(new mongoose.Types.ObjectId(userID));
 
     const resID = user.resID;
 
