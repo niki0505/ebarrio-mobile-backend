@@ -90,14 +90,14 @@ export const watchAllCollectionsChanges = (io) => {
           return;
         }
 
-        const certificates = await getServicesUtils(userID);
+        const services = await getServicesUtils(userID);
         io.to(userID).emit("dbChange", {
-          type: "certificates",
-          data: certificates,
+          type: "services",
+          data: services,
         });
       } else if (change.operationType === "delete") {
         io.emit("dbChange", {
-          type: "certificates",
+          type: "services",
           deleted: true,
           id: change.documentKey._id,
         });
