@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 export const cancelCertReq = async (req, res) => {
   try {
     const { certID } = req.params;
+    console.log(certID);
 
     const cert = await Certificate.findById(certID);
 
