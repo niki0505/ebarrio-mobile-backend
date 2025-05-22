@@ -33,7 +33,17 @@ io.on("connection", (socket) => {
   if (userID) {
     socket.join(userID);
     console.log("User joined", userID);
+  } else {
+    console.warn(`Socket connected without userID: ${socket.id}`);
   }
+
+  socket.on("disconnect", (reason) => {
+    console.log(`Socket disconnected: id=${socket.id}, reason=${reason}`);
+  });
+
+  socket.on("connect_error", (err) => {
+    console.error(`Connection error on socket ${socket.id}:`, err);
+  });
 });
 
 io.adapter(createAdapter(rds, subClient));
