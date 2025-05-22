@@ -29,9 +29,10 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  const { userID, resID } = socket.handshake.query;
-  socket.userID = userID;
-  socket.resID = resID;
+  const { userID } = socket.handshake.query;
+  if (userID) {
+    socket.join(userID);
+  }
 });
 
 io.adapter(createAdapter(rds, subClient));

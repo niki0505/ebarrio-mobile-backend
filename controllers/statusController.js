@@ -7,42 +7,42 @@ import mongoose from "mongoose";
 
 export const getServicesSubmitted = async (req, res) => {
   try {
-    const { userID } = req.params;
-    const user = await User.findById(userID);
-    const resID = user.resID;
+    // const { userID } = req.params;
+    // const user = await User.findById(userID);
+    // const resID = user.resID;
 
-    const certificates = await Certificate.find(
-      { resID: resID },
-      { certID: 0 }
-    );
+    // const certificates = await Certificate.find(
+    //   { resID: resID },
+    //   { certID: 0 }
+    // );
 
-    const reservations = await CourtReservation.find({ resID: resID });
+    // const reservations = await CourtReservation.find({ resID: resID });
 
-    const blotters = await Blotter.find({ complainantID: resID })
-      .populate({
-        path: "subjectID",
-        select: "firstname lastname address",
-      })
-      .populate({ path: "witnessID", select: "firstname lastname" });
+    // const blotters = await Blotter.find({ complainantID: resID })
+    //   .populate({
+    //     path: "subjectID",
+    //     select: "firstname lastname address",
+    //   })
+    //   .populate({ path: "witnessID", select: "firstname lastname" });
 
-    const certificatesWithType = certificates.map((c) => ({
-      ...c.toObject(),
-      type: "Certificate",
-    }));
-    const reservationsWithType = reservations.map((r) => ({
-      ...r.toObject(),
-      type: "Reservation",
-    }));
-    const blottersWithType = blotters.map((b) => ({
-      ...b.toObject(),
-      type: "Blotter",
-    }));
+    // const certificatesWithType = certificates.map((c) => ({
+    //   ...c.toObject(),
+    //   type: "Certificate",
+    // }));
+    // const reservationsWithType = reservations.map((r) => ({
+    //   ...r.toObject(),
+    //   type: "Reservation",
+    // }));
+    // const blottersWithType = blotters.map((b) => ({
+    //   ...b.toObject(),
+    //   type: "Blotter",
+    // }));
 
-    const combined = [
-      ...certificatesWithType,
-      ...reservationsWithType,
-      ...blottersWithType,
-    ];
+    // const combined = [
+    //   ...certificatesWithType,
+    //   ...reservationsWithType,
+    //   ...blottersWithType,
+    // ];
 
     res.status(200).json(combined);
   } catch (error) {
