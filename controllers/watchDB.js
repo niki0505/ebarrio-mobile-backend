@@ -95,7 +95,6 @@ export const watchAllCollectionsChanges = (io) => {
           io.in(userID).emit("dbChange", {
             type: "services",
             data: services,
-            source: "userServiceWatcher",
           });
           console.log(`Successfully emitted dbChange to userID: ${userID}`);
         } catch (err) {
@@ -104,7 +103,6 @@ export const watchAllCollectionsChanges = (io) => {
       } else if (change.operationType === "delete") {
         io.in(userID).emit("dbChange", {
           type: "services",
-          source: "userServiceWatcher",
           deleted: true,
           id: change.documentKey._id,
         });
