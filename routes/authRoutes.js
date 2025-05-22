@@ -127,6 +127,6 @@ router.put("/changemobilenumber", authMiddleware, changeMobileNumber);
 router.put("/changesecurityquestions", authMiddleware, changeSecurityQuestions);
 
 //STATUS
-router.get("/getservices/:userID", authMiddleware, getServicesSubmitted);
+router.get("/getservices", authMiddleware, getServicesSubmitted);
 
 export default router;
