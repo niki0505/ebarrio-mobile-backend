@@ -17,7 +17,10 @@ import {
   resetPassword,
 } from "../controllers/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
-import { sendCertReq } from "../controllers/certificateController.js";
+import {
+  cancelCertReq,
+  sendCertReq,
+} from "../controllers/certificateController.js";
 import { getEmergencyHotlines } from "../controllers/emergencyHotlines.js";
 import {
   getReservations,
@@ -79,6 +82,7 @@ router.post("/verifyotp", verifyOTP);
 
 //CERTIFICATE REQUESTS
 router.post("/sendcertrequest", authMiddleware, sendCertReq);
+router.put("/cancelcertrequest/:certID", authMiddleware, cancelCertReq);
 
 //COURT RESERVATIONS
 router.post("/sendreservationrequest", authMiddleware, sendReservationReq);

@@ -48,7 +48,7 @@ const bSchema = new mongoose.Schema(
     witnesssignature: {
       type: String,
     },
-    type: {
+    typeofthecomplaint: {
       type: String,
     },
     details: {
