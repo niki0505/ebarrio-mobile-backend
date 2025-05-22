@@ -8,8 +8,7 @@ import mongoose from "mongoose";
 export const getServicesSubmitted = async (req, res) => {
   try {
     const { userID } = req.params;
-    const user = await User.findById(new mongoose.Types.ObjectId(userID));
-
+    const user = await User.findById(userID);
     const resID = user.resID;
 
     const certificates = await Certificate.find(
