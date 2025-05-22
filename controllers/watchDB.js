@@ -87,7 +87,10 @@ export const watchAllCollectionsChanges = (io) => {
         type: "services",
         data: services,
       });
-      console.log(`🔁 Emitting service update to userID: ${userID}`);
+      console.log(
+        `[${new Date().toISOString()}] 🔁 Emitting service update to userID: ${userID}`,
+        services
+      );
       console.log(`🔁 Updated services:`, services);
     } else if (change.operationType === "delete") {
       io.emit("dbChange", {
