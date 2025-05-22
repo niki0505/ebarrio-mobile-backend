@@ -66,6 +66,10 @@ export const watchAllCollectionsChanges = (io) => {
   //   }
   // });
 
+  const certificatesChangeStream = db
+    .collection("certificates")
+    .watch([], { fullDocument: "updateLookup" });
+
   certificatesChangeStream.on("change", async (change) => {
     try {
       console.log("Certificates change detected:", change);
