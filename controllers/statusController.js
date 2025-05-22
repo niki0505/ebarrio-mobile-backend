@@ -18,7 +18,12 @@ export const getServicesSubmitted = async (req, res) => {
 
     const reservations = await CourtReservation.find({ resID: resID });
 
-    const blotters = await Blotter.find({ complainantID: resID });
+    const blotters = await Blotter.find({ complainantID: resID })
+      .populate({
+        path: "subjectID",
+        select: "firstname lastname address",
+      })
+      .populate({ path: "witnessID", select: "firstname lastname" });
 
     const certificatesWithType = certificates.map((c) => ({
       ...c.toObject(),
