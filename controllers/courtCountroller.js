@@ -3,6 +3,27 @@ import Resident from "../models/Residents.js";
 import CourtReservation from "../models/CourtReservations.js";
 import mongoose from "mongoose";
 
+export const cancelReservationReq = async (req, res) => {
+  try {
+    const { reservationID } = req.params;
+
+    const reservation = await CourtReservation.findById(reservationID);
+
+    if (!reservation) {
+      return res.status(404).json({ message: "Reservation not found" });
+    }
+
+    reservation.status = "Cancelled";
+    await reservation.save();
+    return res
+      .status(200)
+      .json({ message: "Reservation cancelled successfully!" });
+  } catch (error) {
+    console.error("Error cancelling Reservation:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const getReservations = async (req, res) => {
   try {
     const reservation = await CourtReservation.find().populate("resID");

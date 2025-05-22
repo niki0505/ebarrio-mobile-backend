@@ -23,6 +23,7 @@ import {
 } from "../controllers/certificateController.js";
 import { getEmergencyHotlines } from "../controllers/emergencyHotlines.js";
 import {
+  cancelReservationReq,
   getReservations,
   sendReservationReq,
 } from "../controllers/courtCountroller.js";
@@ -87,6 +88,11 @@ router.put("/cancelcertrequest/:certID", authMiddleware, cancelCertReq);
 //COURT RESERVATIONS
 router.post("/sendreservationrequest", authMiddleware, sendReservationReq);
 router.get("/getreservations", authMiddleware, getReservations);
+router.put(
+  "/cancelreservationrequest/:reservationID",
+  authMiddleware,
+  cancelReservationReq
+);
 
 //BLOTTER REPORTS
 router.post("/sendblotter", authMiddleware, sendBlotter);
