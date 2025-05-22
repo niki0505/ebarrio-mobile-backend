@@ -31,6 +31,7 @@ export const watchAllCollectionsChanges = (io) => {
         data: services,
       });
       console.log(`🔁 Emitting service update to userID: ${userID}`);
+      console.log(`🔁 Updated services: ${services}`);
     } else if (change.operationType === "delete") {
       io.emit("dbChange", {
         type: "services",
