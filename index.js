@@ -32,6 +32,7 @@ io.on("connection", (socket) => {
   const { userID } = socket.handshake.query;
   if (userID) {
     socket.join(userID);
+    console.log("User joined", userID);
   }
 });
 

@@ -8,7 +8,9 @@ export const watchAllCollectionsChanges = (io) => {
   const db = mongoose.connection.db;
 
   // STATUS
-  const certificatesChangeStream = db.collection("certificates").watch();
+  const certificatesChangeStream = db
+    .collection("certificates")
+    .watch([], { fullDocument: "updateLookup" });
 
   certificatesChangeStream.on("change", async (change) => {
     console.log("Certificates change detected:", change);
