@@ -66,43 +66,46 @@ export const watchAllCollectionsChanges = (io) => {
   //   }
   // });
 
-  const certificatesChangeStream = db
-    .collection("certificates")
-    .watch([], { fullDocument: "updateLookup" });
-
   certificatesChangeStream.on("change", async (change) => {
-    console.log("Certificates change detected:", change);
-    if (
-      change.operationType === "update" ||
-      change.operationType === "insert"
-    ) {
-      const changedDoc = change.fullDocument;
-      if (!changedDoc) return;
+    try {
+      console.log("Certificates change detected:", change);
 
-      const userID = await findUserIDByResID(changedDoc.resID);
-      if (!userID) return;
+      if (
+        change.operationType === "update" ||
+        change.operationType === "insert"
+      ) {
+        const changedDoc = change.fullDocument;
+        if (!changedDoc) {
+          console.warn("No fullDocument found in change event.");
+          return;
+        }
 
-      const services = await getServicesUtils(userID);
-      io.to(userID).emit("dbChange", {
-        type: "services",
-        data: services,
-      });
-      console.log(
-        `[${new Date().toISOString()}] 🔁 Emitting service update to userID: ${userID}`,
-        services
-      );
-      console.log(`🔁 Updated services:`, services);
-    } else if (change.operationType === "delete") {
-      io.emit("dbChange", {
-        type: "services",
-        deleted: true,
-        id: change.documentKey._id,
-      });
+        const userID = await findUserIDByResID(changedDoc.resID);
+        if (!userID) {
+          console.warn(`No userID found for resID: ${changedDoc.resID}`);
+          return;
+        }
+
+        const services = await getServicesUtils(userID);
+        io.to(userID).emit("dbChange", {
+          type: "services",
+          data: services,
+        });
+
+        console.log(
+          `[${new Date().toISOString()}] Emitted service update to userID: ${userID}`,
+          services
+        );
+      } else if (change.operationType === "delete") {
+        io.emit("dbChange", {
+          type: "services",
+          deleted: true,
+          id: change.documentKey._id,
+        });
+      }
+    } catch (err) {
+      console.error("Error handling certificates change event:", err);
     }
-  });
-
-  certificatesChangeStream.on("error", (error) => {
-    console.error("Error in change certificates:", error);
   });
 
   // ANNOUNCEMENTS
