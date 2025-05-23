@@ -92,7 +92,7 @@ export const watchAllCollectionsChanges = (io) => {
 
         const services = await getServicesUtils(userID);
         try {
-          io.to(userID).emit("dbChange", {
+          io.to(userID).emit("mobile-dbChange", {
             type: "services",
             data: services,
           });
@@ -103,7 +103,7 @@ export const watchAllCollectionsChanges = (io) => {
       } else if (change.operationType === "delete") {
         const userID = await findUserIDByResID(change.documentKey.resID);
         if (!userID) return;
-        io.to(userID).emit("dbChange", {
+        io.to(userID).emit("mobile-dbChange", {
           type: "services",
           deleted: true,
           id: change.documentKey._id,
@@ -124,12 +124,12 @@ export const watchAllCollectionsChanges = (io) => {
       change.operationType === "insert"
     ) {
       const announcements = await getAnnouncementsUtils();
-      io.emit("dbChange", {
+      io.emit("mobile-dbChange", {
         type: "announcements",
         data: announcements,
       });
     } else if (change.operationType === "delete") {
-      io.emit("dbChange", {
+      io.emit("mobile-dbChange", {
         type: "announcements",
         deleted: true,
         id: change.documentKey._id,
