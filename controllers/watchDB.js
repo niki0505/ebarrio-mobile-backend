@@ -10,62 +10,6 @@ export const watchAllCollectionsChanges = (io) => {
 
   // STATUS
 
-  // // COURT RESERVATIONS
-  // const reservationsChangeStream = db
-  //   .collection("courtreservations")
-  //   .watch([], { fullDocument: "updateLookup" });
-
-  // reservationsChangeStream.on("change", async (change) => {
-  //   console.log("CourtReservation change detected:", change);
-
-  //   if (
-  //     change.operationType === "update" ||
-  //     change.operationType === "insert"
-  //   ) {
-  //     const changedDoc = change.fullDocument;
-  //     if (!changedDoc) return;
-
-  //     const userID = await findUserIDByResID(changedDoc.resID);
-  //     if (!userID) return;
-
-  //     const services = await getServicesUtils(userID);
-  //     io.to(userID).emit("dbChange", {
-  //       type: "services",
-  //       data: services,
-  //     });
-  //     console.log(
-  //       `🔁 Emitting reservation service update to userID: ${userID}`
-  //     );
-  //   }
-  // });
-
-  // // BLOTTERS
-  // const blotterChangeStream = db
-  //   .collection("blotters")
-  //   .watch([], { fullDocument: "updateLookup" });
-
-  // blotterChangeStream.on("change", async (change) => {
-  //   console.log("Blotter change detected:", change);
-
-  //   if (
-  //     change.operationType === "update" ||
-  //     change.operationType === "insert"
-  //   ) {
-  //     const changedDoc = change.fullDocument;
-  //     if (!changedDoc) return;
-
-  //     const userID = await findUserIDByResID(changedDoc.complainantID);
-  //     if (!userID) return;
-
-  //     const services = await getServicesUtils(userID);
-  //     io.to(userID).emit("dbChange", {
-  //       type: "services",
-  //       data: services,
-  //     });
-  //     console.log(`🔁 Emitting blotter service update to userID: ${userID}`);
-  //   }
-  // });
-
   const certificatesChangeStream = db
     .collection("certificates")
     .watch([], { fullDocument: "updateLookup" });
