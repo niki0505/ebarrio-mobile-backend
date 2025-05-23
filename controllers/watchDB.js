@@ -92,7 +92,7 @@ export const watchAllCollectionsChanges = (io) => {
 
         const services = await getServicesUtils(userID);
         try {
-          io.in(userID).emit("dbChange", {
+          io.to(userID).emit("dbChange", {
             type: "services",
             data: services,
           });
@@ -101,7 +101,9 @@ export const watchAllCollectionsChanges = (io) => {
           console.error(`Failed to emit dbChange to userID: ${userID}`, err);
         }
       } else if (change.operationType === "delete") {
-        io.in(userID).emit("dbChange", {
+        const userID = await findUserIDByResID(change.documentKey.resID);
+        if (!userID) return;
+        io.to(userID).emit("dbChange", {
           type: "services",
           deleted: true,
           id: change.documentKey._id,
