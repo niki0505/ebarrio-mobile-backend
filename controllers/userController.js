@@ -7,6 +7,12 @@ export const setPushToken = async (req, res) => {
     const { pushtoken } = req.body;
     const user = await User.findById(req.user.userID);
 
+    if (user.pushtoken === pushtoken) {
+      return res
+        .status(409)
+        .json({ message: "User already has the push token" });
+    }
+
     user.pushtoken = pushtoken;
 
     await user.save();
@@ -14,7 +20,7 @@ export const setPushToken = async (req, res) => {
     console.log("✅ User push token created successfully!");
     return res
       .status(200)
-      .json({ exists: true, message: "User push token created successfully" });
+      .json({ message: "User push token created successfully" });
   } catch (error) {
     console.error("Error in setting push token:", error);
     res.status(500).json({ message: "Internal server error" });
