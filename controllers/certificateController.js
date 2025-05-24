@@ -51,7 +51,7 @@ export const sendCertReq = async (req, res) => {
       message: `${resident.firstname} ${
         resident.lastname
       } requested ${certificate.typeofcertificate.toLowerCase()}.`,
-      timestamp: announcement.createdAt,
+      timestamp: certificate.createdAt,
     });
 
     return res
