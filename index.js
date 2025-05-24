@@ -65,8 +65,8 @@ rds.on("error", (err) => {
   console.error("Redis connection error: ", err);
 });
 
-cron.schedule("*/1 * * * *", () => {
-  console.log("⏰ Running rain check every 1 min...");
+cron.schedule("*/30 * * * *", () => {
+  console.log("⏰ Running rain check every 30 mins...");
   checkRainForecast();
 });
 

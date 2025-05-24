@@ -34,7 +34,14 @@ export const checkRainForecast = async () => {
         hourTime <= now &&
         hourTime > new Date(now.getTime() - 60 * 60 * 1000)
       ) {
-        return hour.condition.text.toLowerCase().includes("sunny");
+        return (
+          hour.condition.text.toLowerCase().includes("rain") ||
+          hour.condition.text.toLowerCase().includes("heavy") ||
+          hour.condition.text.toLowerCase().includes("shower") ||
+          hour.condition.text.toLowerCase().includes("showers") ||
+          hour.condition.text.toLowerCase().includes("drizzle") ||
+          hour.condition.text.toLowerCase().includes("heavy")
+        );
       }
       return false;
     });
@@ -42,7 +49,14 @@ export const checkRainForecast = async () => {
     const rainExpectedInOneHour = hourlyData.some((hour) => {
       const hourTime = new Date(hour.time);
       if (hourTime > now && hourTime <= oneHourLater) {
-        return hour.condition.text.toLowerCase().includes("sunny");
+        return (
+          hour.condition.text.toLowerCase().includes("rain") ||
+          hour.condition.text.toLowerCase().includes("heavy") ||
+          hour.condition.text.toLowerCase().includes("shower") ||
+          hour.condition.text.toLowerCase().includes("showers") ||
+          hour.condition.text.toLowerCase().includes("drizzle") ||
+          hour.condition.text.toLowerCase().includes("heavy")
+        );
       }
       return false;
     });
