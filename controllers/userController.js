@@ -7,6 +7,12 @@ export const setPushToken = async (req, res) => {
     const { pushtoken } = req.body;
     const user = await User.findById(req.user.userID);
 
+    console.log("Push token", pushtoken);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     if (user.pushtoken === pushtoken) {
       return res
         .status(409)
