@@ -1,7 +1,7 @@
 import axios from "axios";
 import { configDotenv } from "dotenv";
 import User from "../models/Users.js";
-
+import { sendPushNotification } from "../utils/collectionUtils.js";
 configDotenv();
 
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
@@ -28,7 +28,6 @@ export const checkRainForecast = async () => {
     const now = new Date();
     const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
 
-    // Check if it's currently raining
     const rainingNow = hourlyData.some((hour) => {
       const hourTime = new Date(hour.time);
       if (
@@ -40,11 +39,10 @@ export const checkRainForecast = async () => {
       return false;
     });
 
-    // Check if rain expected in next hour (but not raining now)
     const rainExpectedInOneHour = hourlyData.some((hour) => {
       const hourTime = new Date(hour.time);
       if (hourTime > now && hourTime <= oneHourLater) {
-        return hour.condition.text.toLowerCase().includes("rain");
+        return hour.condition.text.toLowerCase().includes("sunny");
       }
       return false;
     });
@@ -52,7 +50,7 @@ export const checkRainForecast = async () => {
     if (rainingNow && !isRaining) {
       console.log("🌧️ It’s starting to rain now. Stay safe!");
       isRaining = true;
-      isRainExpected = false; // reset expected flag to avoid double notifications
+      isRainExpected = false;
       for (const element of user) {
         if (element?.pushtoken) {
           await sendPushNotification(

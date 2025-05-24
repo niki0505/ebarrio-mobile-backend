@@ -4,6 +4,26 @@ import Blotter from "../models/Blotters.js";
 import User from "../models/Users.js";
 import Certificate from "../models/Certificates.js";
 
+export const sendPushNotification = async (pushtoken, title, body, screen) => {
+  if (!pushtoken?.startsWith("ExponentPushToken")) {
+    console.error("Invalid Expo push token:", pushtoken);
+    return;
+  }
+
+  try {
+    const response = await axios.post("https://exp.host/--/api/v2/push/send", {
+      to: pushtoken,
+      sound: "default",
+      title,
+      body,
+      data: { screen: screen },
+    });
+    console.log("✅ Push notification sent! Response:", response.data);
+  } catch (error) {
+    console.error("❌ Failed to send push notification:", error.message);
+  }
+};
+
 export const findUserIDByResID = async (resID) => {
   const user = await User.findOne({ resID: resID });
   if (!user) return null;
