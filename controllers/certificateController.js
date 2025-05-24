@@ -2,6 +2,7 @@ import User from "../models/Users.js";
 import Resident from "../models/Residents.js";
 import Certificate from "../models/Certificates.js";
 import mongoose from "mongoose";
+import Notification from "../models/Notifications.js";
 
 export const cancelCertReq = async (req, res) => {
   try {
@@ -53,6 +54,26 @@ export const sendCertReq = async (req, res) => {
       } requested ${certificate.typeofcertificate.toLowerCase()}.`,
       timestamp: certificate.createdAt,
     });
+
+    const allUsers = await User.find(
+      {
+        status: { $in: ["Active", "Inactive"] },
+        role: { $in: ["Secretary", "Clerk"] },
+        _id: { $ne: userID.userID },
+      },
+      "_id"
+    );
+
+    const notifications = allUsers.map((user) => ({
+      userID: user._id,
+      title: `${certificate.typeofcertificate} Request`,
+      message: `${resident.firstname} ${
+        resident.lastname
+      } requested ${certificate.typeofcertificate.toLowerCase()}.`,
+      redirectTo: "/document-requests",
+    }));
+
+    await Notification.insertMany(notifications);
 
     return res
       .status(200)
