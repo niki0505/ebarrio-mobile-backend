@@ -31,6 +31,10 @@ export const sendCertReq = async (req, res) => {
     const userIDAsObjectId = new mongoose.Types.ObjectId(userID);
     const user = await User.findById(userIDAsObjectId);
 
+    const resident = await Resident.findById(user.resID).select(
+      "firstname lastname"
+    );
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -39,6 +43,17 @@ export const sendCertReq = async (req, res) => {
       resID: user.resID,
     });
     await certificate.save();
+
+    const io = req.app.get("socketio");
+
+    io.emit("certificates", {
+      title: `${certificate.typeofcertificate} Request`,
+      message: `${resident.firstname} ${
+        resident.lastname
+      } requested ${certificate.typeofcertificate.toLowerCase()}.`,
+      timestamp: announcement.createdAt,
+    });
+
     return res
       .status(200)
       .json({ message: "Certificate requested successfully!" });
