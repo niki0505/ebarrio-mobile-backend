@@ -75,6 +75,10 @@ export const sendCertReq = async (req, res) => {
 
     await Notification.insertMany(notifications);
 
+    notifications.forEach((notif) => {
+      sendNotificationUpdate(notif.userID.toString(), io);
+    });
+
     return res
       .status(200)
       .json({ message: "Certificate requested successfully!" });
