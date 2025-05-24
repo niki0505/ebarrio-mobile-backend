@@ -4,6 +4,12 @@ import Blotter from "../models/Blotters.js";
 import User from "../models/Users.js";
 import Certificate from "../models/Certificates.js";
 import axios from "axios";
+import Notification from "../models/Notifications.js";
+
+export const sendNotificationUpdate = async (userID, io) => {
+  const notifications = await Notification.find({ userID });
+  io.to(userID).emit("notificationUpdate", notifications);
+};
 
 export const sendPushNotification = async (pushtoken, title, body, screen) => {
   if (!pushtoken?.startsWith("ExponentPushToken")) {

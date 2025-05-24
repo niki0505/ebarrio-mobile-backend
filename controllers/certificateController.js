@@ -3,11 +3,7 @@ import Resident from "../models/Residents.js";
 import Certificate from "../models/Certificates.js";
 import mongoose from "mongoose";
 import Notification from "../models/Notifications.js";
-
-const sendNotificationUpdate = async (userID, io) => {
-  const notifications = await Notification.find({ userID });
-  io.to(userID).emit("notificationUpdate", notifications);
-};
+import { sendNotificationUpdate } from "../utils/collectionUtils.js";
 
 export const cancelCertReq = async (req, res) => {
   try {
