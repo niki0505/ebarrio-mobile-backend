@@ -2,6 +2,25 @@ import User from "../models/Users.js";
 import Resident from "../models/Residents.js";
 import { rds } from "../index.js";
 
+export const setPushToken = async (req, res) => {
+  try {
+    const { pushtoken } = req.body;
+    const user = await User.findById(req.user.userID);
+
+    user.pushtoken = pushtoken;
+
+    await user.save();
+
+    console.log("✅ User push token created successfully!");
+    return res
+      .status(200)
+      .json({ exists: true, message: "User push token created successfully" });
+  } catch (error) {
+    console.error("Error in setting push token:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const resetPassword = async (req, res) => {
   try {
     const { username } = req.params;

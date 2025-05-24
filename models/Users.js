@@ -32,6 +32,9 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: "Inactive",
     },
+    pushtoken: {
+      type: String,
+    },
     securityquestions: [
       {
         question: { type: String, required: true },

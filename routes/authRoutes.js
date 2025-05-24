@@ -15,6 +15,7 @@ import {
 import {
   getUserDetails,
   resetPassword,
+  setPushToken,
 } from "../controllers/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import {
@@ -128,5 +129,8 @@ router.put("/changesecurityquestions", authMiddleware, changeSecurityQuestions);
 
 //STATUS
 router.get("/getservices", authMiddleware, getServicesSubmitted);
+
+//NOTIFICATIONS
+router.put("/setpushtoken", authMiddleware, setPushToken);
 
 export default router;
