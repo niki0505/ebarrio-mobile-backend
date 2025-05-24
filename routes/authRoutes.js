@@ -133,6 +133,6 @@ router.get("/getservices", authMiddleware, getServicesSubmitted);
 
 //NOTIFICATIONS
 router.put("/setpushtoken", authMiddleware, setPushToken);
-router.put("/getnotifications", authMiddleware, getAllNotifications);
+router.get("/getnotifications", authMiddleware, getAllNotifications);
 
 export default router;
