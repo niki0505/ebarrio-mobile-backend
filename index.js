@@ -9,6 +9,8 @@ import Redis from "ioredis";
 import { watchAllCollectionsChanges } from "./controllers/watchDB.js";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { registerSocketEvents, connectedUsers } from "./utils/socket.js";
+import cron from "node-cron";
+import { checkRainForecast } from "./controllers/weatherController.js";
 
 configDotenv();
 
@@ -61,6 +63,11 @@ rds.ping((err, result) => {
 
 rds.on("error", (err) => {
   console.error("Redis connection error: ", err);
+});
+
+cron.schedule("*/1 * * * *", () => {
+  console.log("⏰ Running rain check every 1 min...");
+  checkRainForecast();
 });
 
 const PORT = process.env.PORT;

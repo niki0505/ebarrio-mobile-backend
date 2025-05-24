@@ -1,9 +1,98 @@
 import axios from "axios";
 import { configDotenv } from "dotenv";
+import User from "../models/Users.js";
 
 configDotenv();
 
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
+
+let isRaining = false;
+let isRainExpected = false;
+
+export const checkRainForecast = async () => {
+  try {
+    const user = await User.find().select("pushtoken");
+
+    const response = await axios.get(
+      "http://api.weatherapi.com/v1/forecast.json",
+      {
+        params: {
+          key: WEATHER_API_KEY,
+          q: "14.4613,120.9658",
+          days: 1,
+        },
+      }
+    );
+
+    const hourlyData = response.data.forecast.forecastday[0].hour;
+    const now = new Date();
+    const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+
+    // Check if it's currently raining
+    const rainingNow = hourlyData.some((hour) => {
+      const hourTime = new Date(hour.time);
+      if (
+        hourTime <= now &&
+        hourTime > new Date(now.getTime() - 60 * 60 * 1000)
+      ) {
+        return hour.condition.text.toLowerCase().includes("sunny");
+      }
+      return false;
+    });
+
+    // Check if rain expected in next hour (but not raining now)
+    const rainExpectedInOneHour = hourlyData.some((hour) => {
+      const hourTime = new Date(hour.time);
+      if (hourTime > now && hourTime <= oneHourLater) {
+        return hour.condition.text.toLowerCase().includes("rain");
+      }
+      return false;
+    });
+
+    if (rainingNow && !isRaining) {
+      console.log("🌧️ It’s starting to rain now. Stay safe!");
+      isRaining = true;
+      isRainExpected = false; // reset expected flag to avoid double notifications
+      for (const element of user) {
+        if (element?.pushtoken) {
+          await sendPushNotification(
+            element.pushtoken,
+            `🌧️ Weather Alert`,
+            "It's starting rain now. Stay safe!",
+            "Weather"
+          );
+        } else {
+          console.log("⚠️ No push token found for user:", element.username);
+        }
+      }
+    } else if (!rainingNow && isRaining) {
+      console.log("☀️ Rain stopped. Resetting notification flags.");
+      isRaining = false;
+      isRainExpected = false;
+    } else if (!rainingNow && rainExpectedInOneHour && !isRainExpected) {
+      console.log("🌧️ Rain expected in 1 hour. Stay safe!");
+      isRainExpected = true;
+      for (const element of user) {
+        if (element?.pushtoken) {
+          await sendPushNotification(
+            element.pushtoken,
+            `🌧️ Weather Alert`,
+            "Rain expected in 1 hour. Stay safe!",
+            "Weather"
+          );
+        } else {
+          console.log("⚠️ No push token found for user:", element.username);
+        }
+      }
+    } else if (!rainExpectedInOneHour && isRainExpected) {
+      isRainExpected = false;
+    } else {
+      console.log("No change in rain status, no notification sent.");
+    }
+  } catch (error) {
+    console.error("Error checking rain forecast:", error.message || error);
+  }
+};
 
 export const getWeather = async (req, res) => {
   try {
