@@ -59,8 +59,6 @@ export const checkRainForecast = async () => {
             "It's starting rain now. Stay safe!",
             "Weather"
           );
-        } else {
-          console.log("⚠️ No push token found for user:", element.username);
         }
       }
     } else if (!rainingNow && isRaining) {
@@ -78,8 +76,6 @@ export const checkRainForecast = async () => {
             "Rain expected in 1 hour. Stay safe!",
             "Weather"
           );
-        } else {
-          console.log("⚠️ No push token found for user:", element.username);
         }
       }
     } else if (!rainExpectedInOneHour && isRainExpected) {
