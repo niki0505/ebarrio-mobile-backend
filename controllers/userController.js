@@ -4,22 +4,22 @@ import { rds } from "../index.js";
 
 export const setPushToken = async (req, res) => {
   try {
-    const { pushtoken } = req.body;
+    const { token } = req.body;
     const user = await User.findById(req.user.userID);
 
-    console.log("Push token", pushtoken);
+    console.log("Push token", token);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.pushtoken === pushtoken) {
+    if (user.pushtoken === token) {
       return res
         .status(409)
         .json({ message: "User already has the push token" });
     }
 
-    user.pushtoken = pushtoken;
+    user.pushtoken = token;
 
     await user.save();
 
