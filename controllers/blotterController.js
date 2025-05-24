@@ -3,6 +3,7 @@ import Resident from "../models/Residents.js";
 import Blotter from "../models/Blotters.js";
 import mongoose from "mongoose";
 import { sendNotificationUpdate } from "../utils/collectionUtils.js";
+import Notification from "../models/Notifications.js";
 
 export const sendBlotter = async (req, res) => {
   try {
