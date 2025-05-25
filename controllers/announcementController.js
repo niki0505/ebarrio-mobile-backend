@@ -43,7 +43,7 @@ export const heartAnnouncement = async (req, res) => {
 
     const io = req.app.get("socketio");
 
-    io.to(user._id).emit("announcements", {
+    io.to(user._id).emit("announcement", {
       title: `❤️ ${announcement.title}`,
       message: `${resident.firstname} ${resident.lastname} liked your post`,
       timestamp: announcement.updatedAt,
