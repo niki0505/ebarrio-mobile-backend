@@ -31,7 +31,7 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  const { userID } = socket.handshake.query;
+  const { userID } = socket.handshake.auth;
   if (userID) {
     socket.join(userID);
     console.log("User joined", userID);
