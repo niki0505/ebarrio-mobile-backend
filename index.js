@@ -15,6 +15,7 @@ import {
   processAnnouncements,
   sendPushNotification,
 } from "./utils/collectionUtils.js";
+import mongoose from "mongoose";
 
 configDotenv();
 
@@ -76,6 +77,7 @@ cron.schedule("*/30 * * * *", () => {
 
 cron.schedule("*/1 * * * *", async () => {
   console.log("⏰ Running event check every 30 mins...");
+  const db = mongoose.connection.db;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
