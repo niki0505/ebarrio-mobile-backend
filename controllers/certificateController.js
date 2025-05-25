@@ -8,15 +8,55 @@ import { sendNotificationUpdate } from "../utils/collectionUtils.js";
 export const cancelCertReq = async (req, res) => {
   try {
     const { certID } = req.params;
-
+    const { certReason } = req.body;
     const cert = await Certificate.findById(certID);
+
+    const resident = await Resident.findById(cert.resID).select(
+      "firstname lastname"
+    );
 
     if (!cert) {
       return res.status(404).json({ message: "Certificate not found" });
     }
 
     cert.status = "Cancelled";
+    cert.remarks = certReason;
     await cert.save();
+
+    const io = req.app.get("socketio");
+
+    io.emit("certificates", {
+      title: `❌ ${cert.typeofcertificate} Request Cancelled`,
+      message: `${resident.firstname} ${
+        resident.lastname
+      } cancelled their ${cert.typeofcertificate.toLowerCase()} request.`,
+      timestamp: cert.createdAt,
+    });
+
+    const allUsers = await User.find(
+      {
+        status: { $in: ["Active", "Inactive"] },
+        role: { $in: ["Secretary", "Clerk"] },
+        _id: { $ne: resident.userID },
+      },
+      "_id"
+    );
+
+    const notifications = allUsers.map((user) => ({
+      userID: user._id,
+      title: `❌ ${cert.typeofcertificate} Request Cancelled`,
+      message: `${resident.firstname} ${
+        resident.lastname
+      } cancelled their ${cert.typeofcertificate.toLowerCase()} request.`,
+      redirectTo: "/document-requests",
+    }));
+
+    await Notification.insertMany(notifications);
+
+    notifications.forEach((notif) => {
+      sendNotificationUpdate(notif.userID.toString(), io);
+    });
+
     return res
       .status(200)
       .json({ message: "Certificate cancelled successfully!" });
