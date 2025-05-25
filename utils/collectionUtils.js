@@ -5,8 +5,9 @@ import User from "../models/Users.js";
 import Certificate from "../models/Certificates.js";
 import axios from "axios";
 import Notification from "../models/Notifications.js";
+import mongoose from "mongoose";
 
-export function processAnnouncements(announcements) {
+function processAnnouncements(announcements) {
   return announcements
     .filter((a) => a.status !== "Archived" && a.eventStart && a.eventEnd)
     .map((a) => ({
@@ -15,6 +16,42 @@ export function processAnnouncements(announcements) {
       end: new Date(a.eventEnd),
     }));
 }
+
+export const sendEventNotification = async () => {
+  const db = mongoose.connection.db;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const todaysEvents = await db
+    .collection("announcements")
+    .find({
+      status: { $ne: "Archived" },
+      eventStart: { $lt: tomorrow },
+      eventEnd: { $gt: today },
+    })
+    .toArray();
+
+  const processedEvents = processAnnouncements(todaysEvents);
+  if (processedEvents.length === 0) return;
+
+  const users = await db
+    .collection("users")
+    .find({ pushtoken: { $exists: true } })
+    .toArray();
+
+  for (const user of users) {
+    console.log("Push token", user.pushtoken);
+    await sendPushNotification(
+      user.pushtoken,
+      "📅 Today's Events",
+      `You have ${processedEvents.length} event(s) today!`,
+      "BrgyCalendar"
+    );
+  }
+  console.log(`Notified users of ${processedEvents.length} event(s) today.`);
+};
 
 export const sendNotificationUpdate = async (userID, io) => {
   const notifications = await Notification.find({ userID });

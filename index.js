@@ -11,11 +11,7 @@ import { createAdapter } from "@socket.io/redis-adapter";
 import { registerSocketEvents, connectedUsers } from "./utils/socket.js";
 import cron from "node-cron";
 import { checkRainForecast } from "./controllers/weatherController.js";
-import {
-  processAnnouncements,
-  sendPushNotification,
-} from "./utils/collectionUtils.js";
-import mongoose from "mongoose";
+import { sendEventNotification } from "./utils/collectionUtils.js";
 
 configDotenv();
 
@@ -77,39 +73,7 @@ cron.schedule("*/30 * * * *", () => {
 
 cron.schedule("*/1 * * * *", async () => {
   console.log("⏰ Running event check every 30 mins...");
-  const db = mongoose.connection.db;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const todaysEvents = await db
-    .collection("announcements")
-    .find({
-      status: { $ne: "Archived" },
-      eventStart: { $lt: tomorrow },
-      eventEnd: { $gt: today },
-    })
-    .toArray();
-
-  const processedEvents = processAnnouncements(todaysEvents);
-  if (processedEvents.length === 0) return;
-
-  const users = await db
-    .collection("users")
-    .find({ pushtoken: { $exists: true } })
-    .toArray();
-
-  for (const user of users) {
-    console.log("Push token", user.pushtoken);
-    await sendPushNotification(
-      user.pushtoken,
-      "📅 Today's Events",
-      `You have ${processedEvents.length} event(s) today!`,
-      "BrgyCalendar"
-    );
-  }
-  console.log(`Notified users of ${processedEvents.length} event(s) today.`);
+  sendEventNotification();
 });
 
 const PORT = process.env.PORT;
