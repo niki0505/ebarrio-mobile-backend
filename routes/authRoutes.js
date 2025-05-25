@@ -50,7 +50,10 @@ import {
   verifySecurityQuestion,
 } from "../controllers/forgotPassController.js";
 import { getServicesSubmitted } from "../controllers/statusController.js";
-import { getAllNotifications } from "../controllers/notificationController.js";
+import {
+  getAllNotifications,
+  markAsRead,
+} from "../controllers/notificationController.js";
 
 const router = express.Router();
 
@@ -134,5 +137,6 @@ router.get("/getservices", authMiddleware, getServicesSubmitted);
 //NOTIFICATIONS
 router.put("/setpushtoken", authMiddleware, setPushToken);
 router.get("/getnotifications", authMiddleware, getAllNotifications);
+router.put("/readnotification/:notifID", authMiddleware, markAsRead);
 
 export default router;
