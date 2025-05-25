@@ -90,7 +90,7 @@ export const sendCertReq = async (req, res) => {
     const io = req.app.get("socketio");
 
     io.emit("certificates", {
-      title: `${certificate.typeofcertificate} Request`,
+      title: `📄 ${certificate.typeofcertificate} Request`,
       message: `${resident.firstname} ${
         resident.lastname
       } requested ${certificate.typeofcertificate.toLowerCase()}.`,
@@ -108,7 +108,7 @@ export const sendCertReq = async (req, res) => {
 
     const notifications = allUsers.map((user) => ({
       userID: user._id,
-      title: `${certificate.typeofcertificate} Request`,
+      title: `📄 ${certificate.typeofcertificate} Request`,
       message: `${resident.firstname} ${
         resident.lastname
       } requested ${certificate.typeofcertificate.toLowerCase()}.`,

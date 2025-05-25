@@ -2,6 +2,8 @@ import User from "../models/Users.js";
 import Resident from "../models/Residents.js";
 import CourtReservation from "../models/CourtReservations.js";
 import mongoose from "mongoose";
+import Notification from "../models/Notifications.js";
+import { sendNotificationUpdate } from "../utils/collectionUtils.js";
 
 export const cancelReservationReq = async (req, res) => {
   try {
@@ -41,6 +43,39 @@ export const sendReservationReq = async (req, res) => {
       ...reservationForm,
     });
     await reservation.save();
+
+    const resident = await Resident.findById(reservation.resID);
+
+    const io = req.app.get("socketio");
+
+    io.emit("courtreservations", {
+      title: `📅 Court Reservation Request`,
+      message: `${resident.firstname} ${resident.lastname} requested court reservation.`,
+      timestamp: reservation.createdAt,
+    });
+
+    const allUsers = await User.find(
+      {
+        status: { $in: ["Active", "Inactive"] },
+        role: { $in: ["Secretary", "Clerk"] },
+        _id: { $ne: resident.userID },
+      },
+      "_id"
+    );
+
+    const notifications = allUsers.map((user) => ({
+      userID: user._id,
+      title: `📅 Court Reservation Request`,
+      message: `${resident.firstname} ${resident.lastname} requested court reservation.`,
+      redirectTo: "/court-reservations",
+    }));
+
+    await Notification.insertMany(notifications);
+
+    notifications.forEach((notif) => {
+      sendNotificationUpdate(notif.userID.toString(), io);
+    });
+
     return res
       .status(200)
       .json({ message: "Court reservation requested successfully!" });
