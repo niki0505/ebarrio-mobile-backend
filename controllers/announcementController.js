@@ -39,7 +39,7 @@ export const heartAnnouncement = async (req, res) => {
       "firstname lastname"
     );
 
-    const user = await User.findById(announcement.uploadedby);
+    const user = await User.find({ empID: announcement.uploadedby });
 
     const io = req.app.get("socketio");
 
