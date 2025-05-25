@@ -35,7 +35,7 @@ export const heartAnnouncement = async (req, res) => {
 
     await announcement.save();
 
-    const resident = await Resident.findById(userID).select(
+    const resident = await Resident.find({ userID: userID }).select(
       "firstname lastname"
     );
 
