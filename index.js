@@ -97,13 +97,13 @@ cron.schedule("*/1 * * * *", async () => {
 
   const users = await db
     .collection("users")
-    .find({ expoPushToken: { $exists: true } })
+    .find({ pushtoken: { $exists: true } })
     .toArray();
 
-  for (const element of users) {
-    console.log("Push token", element.pushtoken);
+  for (const user of users) {
+    console.log("Push token", user.pushtoken);
     await sendPushNotification(
-      element.pushtoken,
+      user.pushtoken,
       "📅 Today's Events",
       `You have ${processedEvents.length} event(s) today!`,
       "BrgyCalendar"
