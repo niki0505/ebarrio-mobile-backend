@@ -39,15 +39,15 @@ export const heartAnnouncement = async (req, res) => {
       "firstname lastname"
     );
 
+    const user = await User.findById(announcement.uploadedby);
+
     const io = req.app.get("socketio");
 
-    io.emit("announcements", {
+    io.to(user._id).emit("announcements", {
       title: `❤️ ${announcement.title}`,
       message: `${resident.firstname} ${resident.lastname} liked your post`,
       timestamp: announcement.updatedAt,
     });
-
-    const user = await User.findById(announcement.uploadedby);
 
     const notification = {
       userID: user._id,
