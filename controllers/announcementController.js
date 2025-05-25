@@ -17,6 +17,20 @@ export const unheartAnnouncement = async (req, res) => {
     );
 
     await announcement.save();
+
+    const resident = await Resident.findOne({ userID: userID }).select(
+      "firstname lastname"
+    );
+
+    const user = await User.findOne({ empID: announcement.uploadedby });
+
+    await Notification.deleteOne({
+      announcementID: announcement._id,
+      message: `${resident.firstname} ${resident.lastname} liked your post`,
+    });
+
+    sendNotificationUpdate(user._id.toString(), io);
+
     res.status(200).json({ message: "Announcement unliked successfully" });
   } catch (error) {
     console.error("Error in unliking announcements:", error);
@@ -54,6 +68,7 @@ export const heartAnnouncement = async (req, res) => {
       title: `❤️ ${announcement.title}`,
       message: `${resident.firstname} ${resident.lastname} liked your post`,
       redirectTo: "/announcements",
+      announcementID: announcement._id,
     };
 
     await Notification.insertOne(notification);

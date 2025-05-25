@@ -17,6 +17,10 @@ const nSchema = new mongoose.Schema(
     redirectTo: {
       type: String,
     },
+    announcementID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Announcement",
+    },
   },
   { versionKey: false, timestamps: true }
 );
