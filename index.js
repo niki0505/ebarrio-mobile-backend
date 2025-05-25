@@ -71,8 +71,8 @@ cron.schedule("*/30 * * * *", () => {
   checkRainForecast();
 });
 
-cron.schedule("*/1 * * * *", async () => {
-  console.log("⏰ Running event check every 30 mins...");
+cron.schedule("0 8 * * *", async () => {
+  console.log("⏰ Running event check every 8 AM...");
   sendEventNotification();
 });
 
