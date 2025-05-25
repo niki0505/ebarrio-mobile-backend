@@ -46,7 +46,7 @@ export const sendEventNotification = async () => {
     await sendPushNotification(
       user.pushtoken,
       "📅 Today's Events",
-      `You have ${processedEvents.length} event(s) today!`,
+      `The barangay have ${processedEvents.length} event(s) today!`,
       "BrgyCalendar"
     );
   }
