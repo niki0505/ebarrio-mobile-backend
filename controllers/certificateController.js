@@ -31,7 +31,7 @@ export const cancelCertReq = async (req, res) => {
         resident.lastname
       } cancelled their ${cert.typeofcertificate.toLowerCase()} request.`,
       timestamp: cert.createdAt,
-      isRejectClicked: true,
+      cancelled: true,
     });
 
     const allUsers = await User.find(
