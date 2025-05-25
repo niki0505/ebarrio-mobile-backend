@@ -101,6 +101,7 @@ cron.schedule("*/1 * * * *", async () => {
     .toArray();
 
   for (const element of users) {
+    console.log("Push token", element.pushtoken);
     await sendPushNotification(
       element.pushtoken,
       "📅 Today's Events",
