@@ -8,6 +8,7 @@ import { sendNotificationUpdate } from "../utils/collectionUtils.js";
 export const cancelReservationReq = async (req, res) => {
   try {
     const { reservationID } = req.params;
+    const { reservationReason } = req.body;
 
     const reservation = await CourtReservation.findById(reservationID);
 
@@ -15,8 +16,45 @@ export const cancelReservationReq = async (req, res) => {
       return res.status(404).json({ message: "Reservation not found" });
     }
 
+    const resident = await Resident.findById(reservation.resID).select(
+      "firstname lastname"
+    );
+
     reservation.status = "Cancelled";
+    reservation.remarks = reservationReason;
     await reservation.save();
+
+    const io = req.app.get("socketio");
+
+    io.emit("courtreservations", {
+      title: `❌ Court Reservation Request Cancelled`,
+      message: `${resident.firstname} ${resident.lastname} cancelled their court reservation request.`,
+      timestamp: reservation.createdAt,
+      cancelled: true,
+    });
+
+    const allUsers = await User.find(
+      {
+        status: { $in: ["Active", "Inactive"] },
+        role: { $in: ["Secretary", "Clerk"] },
+        _id: { $ne: resident.userID },
+      },
+      "_id"
+    );
+
+    const notifications = allUsers.map((user) => ({
+      userID: user._id,
+      title: `❌ Court Reservation Request Cancelled`,
+      message: `${resident.firstname} ${resident.lastname} cancelled their court reservation request.`,
+      redirectTo: "/court-reservations",
+    }));
+
+    await Notification.insertMany(notifications);
+
+    notifications.forEach((notif) => {
+      sendNotificationUpdate(notif.userID.toString(), io);
+    });
+
     return res
       .status(200)
       .json({ message: "Reservation cancelled successfully!" });
