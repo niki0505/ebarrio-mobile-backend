@@ -40,7 +40,9 @@ export const watchAllCollectionsChanges = (io) => {
             type: "services",
             data: services,
           });
-          console.log(`Successfully emitted dbChange to userID: ${userID}`);
+          console.log(
+            `Successfully emitted mobile-dbChange to userID: ${userID}`
+          );
         } catch (err) {
           console.error(`Failed to emit dbChange to userID: ${userID}`, err);
         }

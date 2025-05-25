@@ -7,6 +7,7 @@ export const registerSocketEvents = (io) => {
     socket.on("register", (userID) => {
       connectedUsers.set(userID, socket.id);
       socket.join(userID); // Personal rooms
+      console.log(`Socket joined room: ${userID}`);
     });
 
     socket.on("join_announcements", () => {
