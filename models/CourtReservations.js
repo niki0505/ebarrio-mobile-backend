@@ -29,6 +29,9 @@ const crSchema = new mongoose.Schema(
       required: true,
       default: "Pending",
     },
+    remarks: {
+      type: String,
+    },
   },
   { versionKey: false, timestamps: true }
 );
