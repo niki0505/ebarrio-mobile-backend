@@ -11,6 +11,10 @@ import { createAdapter } from "@socket.io/redis-adapter";
 import { registerSocketEvents, connectedUsers } from "./utils/socket.js";
 import cron from "node-cron";
 import { checkRainForecast } from "./controllers/weatherController.js";
+import {
+  processAnnouncements,
+  sendPushNotification,
+} from "./utils/collectionUtils.js";
 
 configDotenv();
 
@@ -68,6 +72,41 @@ rds.on("error", (err) => {
 cron.schedule("*/30 * * * *", () => {
   console.log("⏰ Running rain check every 30 mins...");
   checkRainForecast();
+});
+
+cron.schedule("*/1 * * * *", async () => {
+  console.log("⏰ Running event check every 30 mins...");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const todaysEvents = await db
+    .collection("announcements")
+    .find({
+      status: { $ne: "Archived" },
+      eventStart: { $lt: tomorrow },
+      eventEnd: { $gt: today },
+    })
+    .toArray();
+
+  const processedEvents = processAnnouncements(todaysEvents);
+  if (processedEvents.length === 0) return;
+
+  const users = await db
+    .collection("users")
+    .find({ expoPushToken: { $exists: true } })
+    .toArray();
+
+  for (const element of users) {
+    await sendPushNotification(
+      element.pushtoken,
+      "📅 Today's Events",
+      `You have ${processedEvents.length} event(s) today!`,
+      "BrgyCalendar"
+    );
+  }
+  console.log(`Notified users of ${processedEvents.length} event(s) today.`);
 });
 
 const PORT = process.env.PORT;

@@ -6,6 +6,16 @@ import Certificate from "../models/Certificates.js";
 import axios from "axios";
 import Notification from "../models/Notifications.js";
 
+export function processAnnouncements(announcements) {
+  return announcements
+    .filter((a) => a.status !== "Archived" && a.eventStart && a.eventEnd)
+    .map((a) => ({
+      title: a.title,
+      start: new Date(a.eventStart),
+      end: new Date(a.eventEnd),
+    }));
+}
+
 export const sendNotificationUpdate = async (userID, io) => {
   const notifications = await Notification.find({ userID });
   io.to(userID).emit("notificationUpdate", notifications);
