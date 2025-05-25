@@ -21,6 +21,7 @@ export const unheartAnnouncement = async (req, res) => {
     const resident = await Resident.findOne({ userID: userID }).select(
       "firstname lastname"
     );
+    const io = req.app.get("socketio");
 
     const user = await User.findOne({ empID: announcement.uploadedby });
 
