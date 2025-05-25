@@ -1,5 +1,9 @@
 import Announcement from "../models/Announcements.js";
 import { getAnnouncementsUtils } from "../utils/collectionUtils.js";
+import Notification from "../models/Notifications.js";
+import { sendNotificationUpdate } from "../utils/collectionUtils.js";
+import Resident from "../models/Residents.js";
+import User from "../models/Users.js";
 
 export const unheartAnnouncement = async (req, res) => {
   try {
@@ -30,6 +34,31 @@ export const heartAnnouncement = async (req, res) => {
     announcement.heartedby.push(userID);
 
     await announcement.save();
+
+    const resident = await Resident.findById(userID).select(
+      "firstname lastname"
+    );
+
+    const io = req.app.get("socketio");
+
+    io.emit("announcements", {
+      title: `❤️ ${announcement.title}`,
+      message: `${resident.firstname} ${resident.lastname} liked your post`,
+      timestamp: announcement.updatedAt,
+    });
+
+    const user = await User.findById(announcement.uploadedby);
+
+    const notification = {
+      userID: user._id,
+      title: `❤️ ${announcement.title}`,
+      message: `${resident.firstname} ${resident.lastname} liked your post`,
+      redirectTo: "/announcements",
+    };
+
+    await Notification.insertOne(notification);
+    sendNotificationUpdate(user._id.toString(), io);
+
     res.status(200).json({ message: "Announcement liked successfully" });
   } catch (error) {
     console.error("Error in liking announcements:", error);
