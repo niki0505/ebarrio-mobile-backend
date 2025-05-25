@@ -35,11 +35,11 @@ export const heartAnnouncement = async (req, res) => {
 
     await announcement.save();
 
-    const resident = await Resident.find({ userID: userID }).select(
+    const resident = await Resident.findOne({ userID: userID }).select(
       "firstname lastname"
     );
 
-    const user = await User.find({ empID: announcement.uploadedby });
+    const user = await User.findOne({ empID: announcement.uploadedby });
 
     const io = req.app.get("socketio");
 
