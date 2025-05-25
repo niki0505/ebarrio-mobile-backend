@@ -36,7 +36,7 @@ export const watchAllCollectionsChanges = (io) => {
 
         const services = await getServicesUtils(userID);
         try {
-          io.to(userID).emit("mobile-dbChange", {
+          io.emit("mobile-dbChange", {
             type: "services",
             data: services,
           });
@@ -47,9 +47,7 @@ export const watchAllCollectionsChanges = (io) => {
           console.error(`Failed to emit dbChange to userID: ${userID}`, err);
         }
       } else if (change.operationType === "delete") {
-        const userID = await findUserIDByResID(change.documentKey.resID);
-        if (!userID) return;
-        io.to(userID).emit("mobile-dbChange", {
+        io.emit("mobile-dbChange", {
           type: "services",
           deleted: true,
           id: change.documentKey._id,
