@@ -1,6 +1,7 @@
 import Resident from "../models/Residents.js";
 import User from "../models/Users.js";
 import bcrypt from "bcryptjs";
+import ActivityLog from "../models/ActivityLogs.js";
 
 export const checkPassword = async (req, res) => {
   try {
@@ -23,7 +24,8 @@ export const checkPassword = async (req, res) => {
 export const changeMobileNumber = async (req, res) => {
   try {
     const { mobilenumber } = req.body;
-    const user = await User.findById({ _id: req.user.userID }).populate({
+    const { userID } = req.user;
+    const user = await User.findById({ _id: userID }).populate({
       path: "empID",
       select: "resID",
     });
@@ -40,6 +42,12 @@ export const changeMobileNumber = async (req, res) => {
     resident.mobilenumber = mobilenumber;
     await resident.save();
 
+    await ActivityLog.insertOne({
+      userID: userID,
+      action: "Account Settings",
+      description: `User updated their mobile number.`,
+    });
+
     res.status(200).json({ message: "Mobile number changed successfully!" });
   } catch (error) {
     console.log("Error changing mobile number", error);
@@ -49,9 +57,10 @@ export const changeMobileNumber = async (req, res) => {
 
 export const changeSecurityQuestions = async (req, res) => {
   try {
+    const { userID } = req.user;
     const { securityquestions, password } = req.body;
 
-    const user = await User.findById({ _id: req.user.userID });
+    const user = await User.findById({ _id: userID });
 
     const isMatch = await bcrypt.compare(password, user.password);
 
@@ -69,6 +78,12 @@ export const changeSecurityQuestions = async (req, res) => {
 
     await user.save();
 
+    await ActivityLog.insertOne({
+      userID: userID,
+      action: "Account Settings",
+      description: `User updated their security questions.`,
+    });
+
     res
       .status(200)
       .json({ message: "Security questions changed successfully!" });
@@ -80,8 +95,9 @@ export const changeSecurityQuestions = async (req, res) => {
 
 export const changePassword = async (req, res) => {
   try {
+    const { userID } = req.user;
     const { newpassword, password } = req.body;
-    const user = await User.findById({ _id: req.user.userID });
+    const user = await User.findById({ _id: userID });
 
     const isMatch = await bcrypt.compare(password, user.password);
 
@@ -92,6 +108,12 @@ export const changePassword = async (req, res) => {
     user.password = newpassword;
     await user.save();
 
+    await ActivityLog.insertOne({
+      userID: userID,
+      action: "Account Settings",
+      description: `User updated their password.`,
+    });
+
     res.status(200).json({ message: "Password changed successfully!" });
   } catch (error) {
     console.log("Error changing password", error);
@@ -101,8 +123,9 @@ export const changePassword = async (req, res) => {
 
 export const changeUsername = async (req, res) => {
   try {
+    const { userID } = req.user;
     const { username, password } = req.body;
-    const user = await User.findById({ _id: req.user.userID });
+    const user = await User.findById({ _id: userID });
 
     const isMatch = await bcrypt.compare(password, user.password);
 
@@ -112,6 +135,11 @@ export const changeUsername = async (req, res) => {
 
     user.username = username;
     await user.save();
+    await ActivityLog.insertOne({
+      userID: userID,
+      action: "Account Settings",
+      description: `User updated their username.`,
+    });
 
     res.status(200).json({ message: "Username changed successfully!" });
   } catch (error) {
