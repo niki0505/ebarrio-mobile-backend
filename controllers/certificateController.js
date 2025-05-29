@@ -63,7 +63,7 @@ export const cancelCertReq = async (req, res) => {
     await ActivityLog.insertOne({
       userID: userID,
       action: "Document Request",
-      description: `User cancelled their ${cert.typeofcertificate.toLowerCase()}'s request`,
+      description: `User cancelled their ${cert.typeofcertificate.toLowerCase()} request`,
     });
     return res
       .status(200)

@@ -4,6 +4,7 @@ import Notification from "../models/Notifications.js";
 import { sendNotificationUpdate } from "../utils/collectionUtils.js";
 import Resident from "../models/Residents.js";
 import User from "../models/Users.js";
+import ActivityLog from "../models/ActivityLogs.js";
 
 export const unheartAnnouncement = async (req, res) => {
   try {
@@ -31,6 +32,12 @@ export const unheartAnnouncement = async (req, res) => {
     });
 
     sendNotificationUpdate(user._id.toString(), io);
+
+    await ActivityLog.insertOne({
+      userID: userID,
+      action: "Announcements",
+      description: `User unliked ${announcement.title} post`,
+    });
 
     res.status(200).json({ message: "Announcement unliked successfully" });
   } catch (error) {
@@ -74,6 +81,12 @@ export const heartAnnouncement = async (req, res) => {
 
     await Notification.insertOne(notification);
     sendNotificationUpdate(user._id.toString(), io);
+
+    await ActivityLog.insertOne({
+      userID: userID,
+      action: "Announcements",
+      description: `User liked ${announcement.title} post`,
+    });
 
     res.status(200).json({ message: "Announcement liked successfully" });
   } catch (error) {

@@ -1,12 +1,13 @@
 import User from "../models/Users.js";
 import Resident from "../models/Residents.js";
 import Blotter from "../models/Blotters.js";
-import mongoose from "mongoose";
+import ActivityLog from "../models/ActivityLogs.js";
 import { sendNotificationUpdate } from "../utils/collectionUtils.js";
 import Notification from "../models/Notifications.js";
 
 export const sendBlotter = async (req, res) => {
   try {
+    const { userID } = req.user;
     const { updatedForm } = req.body;
     const blotter = new Blotter({
       ...updatedForm,
@@ -43,6 +44,12 @@ export const sendBlotter = async (req, res) => {
 
     notifications.forEach((notif) => {
       sendNotificationUpdate(notif.userID.toString(), io);
+    });
+
+    await ActivityLog.insertOne({
+      userID: userID,
+      action: "Blotter Report",
+      description: `User submitted a blotter report.`,
     });
     return res.status(200).json({ message: "Blotter submitted successfully!" });
   } catch (error) {
