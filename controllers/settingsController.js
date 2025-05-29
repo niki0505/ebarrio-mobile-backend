@@ -2,6 +2,24 @@ import Resident from "../models/Residents.js";
 import User from "../models/Users.js";
 import bcrypt from "bcryptjs";
 
+export const checkPassword = async (req, res) => {
+  try {
+    const { mobilenumber } = req.body;
+    const user = await User.findById({ _id: req.user.userID });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect password." });
+    }
+
+    res.status(200).json({ message: "Correct password" });
+  } catch (error) {
+    console.log("Error changing mobile number", error);
+    res.status(500).json({ message: "Failed to change mobile number" });
+  }
+};
+
 export const changeMobileNumber = async (req, res) => {
   try {
     const { mobilenumber, password } = req.body;

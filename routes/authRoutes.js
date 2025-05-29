@@ -41,6 +41,7 @@ import {
   changePassword,
   changeSecurityQuestions,
   changeUsername,
+  checkPassword,
 } from "../controllers/settingsController.js";
 import {
   checkOTP,
@@ -130,6 +131,7 @@ router.put("/changeusername", authMiddleware, changeUsername);
 router.put("/changepassword", authMiddleware, changePassword);
 router.put("/changemobilenumber", authMiddleware, changeMobileNumber);
 router.put("/changesecurityquestions", authMiddleware, changeSecurityQuestions);
+router.post("/checkpassword", authMiddleware, checkPassword);
 
 //STATUS
 router.get("/getservices", authMiddleware, getServicesSubmitted);
