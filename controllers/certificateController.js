@@ -131,7 +131,7 @@ export const sendCertReq = async (req, res) => {
     await ActivityLog.insertOne({
       userID: userID,
       action: "Document Request",
-      description: `User requested ${cert.typeofcertificate.toLowerCase()}`,
+      description: `User requested ${certificate.typeofcertificate.toLowerCase()}`,
     });
 
     return res
