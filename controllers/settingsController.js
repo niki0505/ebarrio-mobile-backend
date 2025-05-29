@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 
 export const checkPassword = async (req, res) => {
   try {
-    const { mobilenumber } = req.body;
+    const { password } = req.body;
     const user = await User.findById({ _id: req.user.userID });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -22,18 +22,11 @@ export const checkPassword = async (req, res) => {
 
 export const changeMobileNumber = async (req, res) => {
   try {
-    const { mobilenumber, password } = req.body;
+    const { mobilenumber } = req.body;
     const user = await User.findById({ _id: req.user.userID }).populate({
       path: "empID",
       select: "resID",
     });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(400).json({ message: "Incorrect password" });
-    }
-
     let resID;
 
     if (user.empID) {
