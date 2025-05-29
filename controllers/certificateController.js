@@ -4,11 +4,13 @@ import Certificate from "../models/Certificates.js";
 import mongoose from "mongoose";
 import Notification from "../models/Notifications.js";
 import { sendNotificationUpdate } from "../utils/collectionUtils.js";
+import ActivityLog from "../models/ActivityLogs.js";
 
 export const cancelCertReq = async (req, res) => {
   try {
     const { certID } = req.params;
     const { certReason } = req.body;
+    const { userID } = req.user;
     const cert = await Certificate.findById(certID);
 
     const resident = await Resident.findById(cert.resID).select(
@@ -58,6 +60,11 @@ export const cancelCertReq = async (req, res) => {
       sendNotificationUpdate(notif.userID.toString(), io);
     });
 
+    await ActivityLog.insertOne({
+      userID: userID,
+      action: "Document Request",
+      description: `User cancelled their ${cert.typeofcertificate.toLowerCase()}'s request`,
+    });
     return res
       .status(200)
       .json({ message: "Certificate cancelled successfully!" });
@@ -119,6 +126,12 @@ export const sendCertReq = async (req, res) => {
 
     notifications.forEach((notif) => {
       sendNotificationUpdate(notif.userID.toString(), io);
+    });
+
+    await ActivityLog.insertOne({
+      userID: userID,
+      action: "Document Request",
+      description: `User requested ${cert.typeofcertificate.toLowerCase()}`,
     });
 
     return res
