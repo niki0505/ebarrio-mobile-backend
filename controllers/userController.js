@@ -2,7 +2,7 @@ import User from "../models/Users.js";
 import ActivityLog from "../models/ActivityLogs.js";
 import { rds } from "../index.js";
 
-export const viewDisaster = async (req, res) => {
+export const logActivity = async (req, res) => {
   try {
     const { action, description } = req.body;
     const { userID } = req.user;

@@ -14,6 +14,7 @@ import {
 } from "../controllers/authController.js";
 import {
   getUserDetails,
+  logActivity,
   resetPassword,
   setPushToken,
   viewDisaster,
@@ -82,7 +83,7 @@ router.get("/checkotp/:username", checkOTP);
 
 //USERS
 router.put("/resetpassword/:username", resetPassword);
-router.post("/viewdisaster", authMiddleware, viewDisaster);
+router.post("/logactivity", authMiddleware, logActivity);
 
 //OTP
 router.post("/sendotp", sendOTP);
