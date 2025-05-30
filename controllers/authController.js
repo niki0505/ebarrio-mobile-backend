@@ -325,7 +325,7 @@ export const checkCredentials = async (req, res) => {
           });
           return res.status(429).json({
             message:
-              "Too many failed login attempts. Please try again after 1 hour.",
+              "Too many failed login attempts. Please try again after 30 seconds.",
           });
         }
 
@@ -398,6 +398,12 @@ export const loginUser = async (req, res) => {
     );
 
     const decoded = jwt.decode(refreshToken);
+
+    await ActivityLog.insertOne({
+      userID: user._id,
+      action: "Login",
+      description: "User logged in successfully.",
+    });
 
     rds.del(`login_attempts_${user._id}`, (err) => {
       if (err) {
