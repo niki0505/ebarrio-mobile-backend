@@ -243,7 +243,7 @@ export const logoutUser = async (req, res) => {
 
     await ActivityLog.insertOne({
       userID: userID,
-      action: Logout,
+      action: "Logout",
       description: "User logged out successfully.",
     });
 
