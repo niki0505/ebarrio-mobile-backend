@@ -71,7 +71,7 @@ router.get("/getuserdetails", authMiddleware, getUserDetails);
 
 router.post("/checkrefreshtoken", checkRefreshToken);
 router.get("/refreshtoken", refreshAccessToken);
-router.post("/logout", logoutUser);
+router.post("/logout", authMiddleware, logoutUser);
 
 //FORGOT PASSWORD
 router.get("/checkuser/:username", checkUser);

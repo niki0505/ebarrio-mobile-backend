@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { configDotenv } from "dotenv";
 import axios from "axios";
 import { rds } from "../index.js";
+import ActivityLog from "../models/ActivityLogs.js";
 
 configDotenv();
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
@@ -233,12 +234,18 @@ export const registerUser = async (req, res) => {
 };
 
 export const logoutUser = async (req, res) => {
-  const { userID } = req.body;
+  const { userID } = req.user;
   try {
-    const user = await User.findById(userID);
-    if (!user) return res.status(404).json({ message: "User not found" });
-    user.status = "Inactive";
-    await user.save();
+    // const user = await User.findById(userID);
+    // if (!user) return res.status(404).json({ message: "User not found" });
+    // user.status = "Inactive";
+    // await user.save();
+
+    await ActivityLog.insertOne({
+      userID: userID,
+      action: Logout,
+      description: "User logged out successfully.",
+    });
 
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
