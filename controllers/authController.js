@@ -234,8 +234,8 @@ export const registerUser = async (req, res) => {
 };
 
 export const logoutUser = async (req, res) => {
-  const { userID } = req.user;
   try {
+    const { userID } = req.user;
     // const user = await User.findById(userID);
     // if (!user) return res.status(404).json({ message: "User not found" });
     // user.status = "Inactive";
@@ -297,11 +297,41 @@ export const checkCredentials = async (req, res) => {
       return;
     }
 
+    const key = `login_attempts_${user._id}`;
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log("❌ Incorrect Password");
-      return res.status(403).json({
-        message: "Incorrect password",
+      rds.incr(key, async (err, attempts) => {
+        if (err) {
+          console.error("Redis error:", err);
+        }
+
+        if (attempts === 1) {
+          rds.expire(key, 3600);
+        }
+
+        await ActivityLog.insertOne({
+          userID: user._id,
+          action: "Login",
+          description: "The login attempt failed due to an incorrect password.",
+        });
+
+        if (attempts > 5) {
+          await ActivityLog.insertOne({
+            userID: user._id,
+            action: "Login",
+            description:
+              "User was locked out due to many failed login attempts.",
+          });
+          return res.status(429).json({
+            message:
+              "Too many failed login attempts. Please try again after 1 hour.",
+          });
+        }
+
+        return res.status(403).json({
+          message: "Invalid credentials.",
+        });
       });
     }
     return res.status(200).json({
