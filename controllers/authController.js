@@ -399,6 +399,12 @@ export const loginUser = async (req, res) => {
 
     const decoded = jwt.decode(refreshToken);
 
+    rds.del(`login_attempts_${user._id}`, (err) => {
+      if (err) {
+        console.error("Error deleting login attempts key:", err);
+      }
+    });
+
     return res.status(200).json({
       message: "User logged in successfully",
       accessToken,
