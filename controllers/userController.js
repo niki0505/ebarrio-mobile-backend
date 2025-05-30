@@ -1,6 +1,26 @@
 import User from "../models/Users.js";
-import Resident from "../models/Residents.js";
+import ActivityLog from "../models/ActivityLogs.js";
 import { rds } from "../index.js";
+
+export const viewDisaster = async (req, res) => {
+  try {
+    const { action, description } = req.body;
+    const { userID } = req.user;
+
+    await ActivityLog.insertOne({
+      userID: userID,
+      action: { action },
+      description: { description },
+    });
+
+    return res
+      .status(200)
+      .json({ message: "User logged activity successfully" });
+  } catch (error) {
+    console.error("Error in logging activity:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export const setPushToken = async (req, res) => {
   try {

@@ -16,6 +16,7 @@ import {
   getUserDetails,
   resetPassword,
   setPushToken,
+  viewDisaster,
 } from "../controllers/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import {
@@ -61,7 +62,6 @@ const router = express.Router();
 router.post("/refresh", refreshAccessToken);
 router.post("/checkresident", checkResident);
 router.post("/register", registerUser);
-// router.post("/checkusername", checkUsername);
 
 //LOGIN
 router.post("/login", loginUser);
@@ -82,6 +82,7 @@ router.get("/checkotp/:username", checkOTP);
 
 //USERS
 router.put("/resetpassword/:username", resetPassword);
+router.post("/viewdisaster", authMiddleware, viewDisaster);
 
 //OTP
 router.post("/sendotp", sendOTP);
