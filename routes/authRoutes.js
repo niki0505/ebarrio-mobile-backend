@@ -17,7 +17,6 @@ import {
   logActivity,
   resetPassword,
   setPushToken,
-  viewDisaster,
 } from "../controllers/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import {
