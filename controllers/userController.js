@@ -9,8 +9,8 @@ export const viewDisaster = async (req, res) => {
 
     await ActivityLog.insertOne({
       userID: userID,
-      action: { action },
-      description: { description },
+      action: action,
+      description: description,
     });
 
     return res
