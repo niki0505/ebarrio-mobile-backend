@@ -6,6 +6,7 @@ import Certificate from "../models/Certificates.js";
 import axios from "axios";
 import Notification from "../models/Notifications.js";
 import mongoose from "mongoose";
+import EmergencyHotline from "../models/EmergencyHotlines.js";
 
 function processAnnouncements(announcements) {
   return announcements
@@ -125,6 +126,18 @@ export const getServicesUtils = async (userID) => {
     return combined;
   } catch (error) {
     throw new Error("Error fetching services: " + error.message);
+  }
+};
+
+export const getEmergencyHotlinesUtils = async () => {
+  try {
+    const emergency = await EmergencyHotline.find({
+      status: { $ne: "Archived" },
+    });
+
+    return emergency;
+  } catch (error) {
+    throw new Error("Error fetching announcements: " + error.message);
   }
 };
 
