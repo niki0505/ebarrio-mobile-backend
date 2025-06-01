@@ -108,10 +108,14 @@ export const getServicesUtils = async (userID) => {
       ...c.toObject(),
       type: "Certificate",
     }));
-    const reservationsWithType = reservations.map((r) => ({
-      ...r.toObject(),
-      type: "Reservation",
-    }));
+    const reservationsWithType = reservations.map((r) => {
+      const timesObj = Object.fromEntries(r.times);
+      return {
+        ...r.toObject(),
+        type: "Reservation",
+        times: timesObj,
+      };
+    });
     const blottersWithType = blotters.map((b) => ({
       ...b.toObject(),
       type: "Blotter",
