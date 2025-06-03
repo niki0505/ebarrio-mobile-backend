@@ -86,7 +86,7 @@ router.get("/checkotp/:username", checkOTP);
 //USERS
 router.put("/resetpassword/:username", resetPassword);
 router.post("/logactivity", authMiddleware, logActivity);
-router.api("/getusers", authMiddleware, getAllUsers);
+router.get("/getusers", authMiddleware, getAllUsers);
 
 //OTP
 router.post("/sendotp", sendOTP);
