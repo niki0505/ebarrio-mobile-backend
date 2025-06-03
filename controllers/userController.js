@@ -60,6 +60,7 @@ export const resetPassword = async (req, res) => {
     const { password } = req.body;
     const user = await User.findOne({ username: username });
 
+    user.set("passwordistoken", undefined);
     user.password = password;
     user.status = "Inactive";
 
@@ -73,7 +74,6 @@ export const resetPassword = async (req, res) => {
       }
     });
 
-    console.log("✅ User reset password successfully!");
     return res
       .status(200)
       .json({ exists: true, message: "User reset password successfully" });
