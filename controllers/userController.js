@@ -1,6 +1,7 @@
 import User from "../models/Users.js";
 import ActivityLog from "../models/ActivityLogs.js";
 import { rds } from "../index.js";
+import { getUsersUtils } from "../utils/collectionUtils.js";
 
 export const logActivity = async (req, res) => {
   try {
@@ -112,5 +113,15 @@ export const getUserDetails = async (req, res) => {
   } catch (error) {
     console.error("Error fetching user details:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await getUsersUtils();
+    res.status(200).json(users);
+  } catch (error) {
+    console.log("Error fetching users", error);
+    res.status(500).json({ message: "Failed to fetch users" });
   }
 };

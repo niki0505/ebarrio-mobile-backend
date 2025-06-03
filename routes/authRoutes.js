@@ -14,6 +14,7 @@ import {
   deactivatedUser,
 } from "../controllers/authController.js";
 import {
+  getAllUsers,
   getUserDetails,
   logActivity,
   resetPassword,
@@ -85,6 +86,7 @@ router.get("/checkotp/:username", checkOTP);
 //USERS
 router.put("/resetpassword/:username", resetPassword);
 router.post("/logactivity", authMiddleware, logActivity);
+router.api("/getusers", authMiddleware, getAllUsers);
 
 //OTP
 router.post("/sendotp", sendOTP);
