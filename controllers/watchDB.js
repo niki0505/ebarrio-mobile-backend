@@ -86,6 +86,104 @@ export const watchAllCollectionsChanges = (io) => {
     }
   });
 
+  const blotterChangeStream = db
+    .collection("blotters")
+    .watch([], { fullDocument: "updateLookup" });
+
+  blotterChangeStream.on("change", async (change) => {
+    try {
+      console.log("Blotters change detected:", change);
+
+      if (
+        change.operationType === "update" ||
+        change.operationType === "insert"
+      ) {
+        const changedDoc = change.fullDocument;
+        if (!changedDoc) {
+          console.warn("No fullDocument found in change event.");
+          return;
+        }
+
+        const userID = await findUserIDByResID(changedDoc.resID);
+        if (!userID) {
+          console.warn(`No userID found for resID: ${changedDoc.resID}`);
+          return;
+        }
+
+        const services = await getServicesUtils(userID);
+        console.log("Fetched services:", services);
+        try {
+          io.emit("mobile-dbChange", {
+            type: "services",
+            data: services,
+          });
+          console.log(
+            `Successfully emitted mobile-dbChange to userID: ${userID}`
+          );
+        } catch (err) {
+          console.error(`Failed to emit dbChange to userID: ${userID}`, err);
+        }
+      } else if (change.operationType === "delete") {
+        io.emit("mobile-dbChange", {
+          type: "services",
+          deleted: true,
+          id: change.documentKey._id,
+        });
+      }
+    } catch (err) {
+      console.error("Error handling blotter change event:", err);
+    }
+  });
+
+  const courtChangeStream = db
+    .collection("courtreservations")
+    .watch([], { fullDocument: "updateLookup" });
+
+  courtChangeStream.on("change", async (change) => {
+    try {
+      console.log("Court reservations change detected:", change);
+
+      if (
+        change.operationType === "update" ||
+        change.operationType === "insert"
+      ) {
+        const changedDoc = change.fullDocument;
+        if (!changedDoc) {
+          console.warn("No fullDocument found in change event.");
+          return;
+        }
+
+        const userID = await findUserIDByResID(changedDoc.resID);
+        if (!userID) {
+          console.warn(`No userID found for resID: ${changedDoc.resID}`);
+          return;
+        }
+
+        const services = await getServicesUtils(userID);
+        console.log("Fetched services:", services);
+        try {
+          io.emit("mobile-dbChange", {
+            type: "services",
+            data: services,
+          });
+          console.log(
+            `Successfully emitted mobile-dbChange to userID: ${userID}`
+          );
+        } catch (err) {
+          console.error(`Failed to emit dbChange to userID: ${userID}`, err);
+        }
+      } else if (change.operationType === "delete") {
+        io.emit("mobile-dbChange", {
+          type: "services",
+          deleted: true,
+          id: change.documentKey._id,
+        });
+      }
+    } catch (err) {
+      console.error("Error handling court reservations change event:", err);
+    }
+  });
+
   // ANNOUNCEMENTS
   const announcementsChangeStream = db.collection("announcements").watch();
 
