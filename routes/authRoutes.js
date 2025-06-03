@@ -12,6 +12,8 @@ import {
   checkCredentials,
   checkUsername,
   deactivatedUser,
+  archivedUser,
+  updatedUser,
 } from "../controllers/authController.js";
 import {
   getAllUsers,
@@ -70,7 +72,9 @@ router.post("/login", loginUser);
 router.get("/getmobilenumber/:username", getMobileNumber);
 router.post("/checkcredentials", checkCredentials);
 router.get("/getuserdetails", authMiddleware, getUserDetails);
-router.post("/deactivateduser/", authMiddleware, deactivatedUser);
+router.post("/deactivateduser", authMiddleware, deactivatedUser);
+router.post("/archiveduser", authMiddleware, archivedUser);
+router.post("/updateduser", authMiddleware, updatedUser);
 
 router.post("/checkrefreshtoken", checkRefreshToken);
 router.get("/refreshtoken", refreshAccessToken);

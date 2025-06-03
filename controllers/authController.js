@@ -11,6 +11,47 @@ configDotenv();
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
 
+export const updatedUser = async (req, res) => {
+  try {
+    const { userID } = req.user;
+
+    const user = await User.findById(userID);
+    user.status = "Password Not Set";
+    user.passwordistoken = true;
+    user.set("pushtoken", undefined);
+
+    await user.save();
+
+    res.status(200).json({
+      message:
+        "You've been logged out because your account credentials has been updated. If this is unexpected, please contact the admin.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const archivedUser = async (req, res) => {
+  try {
+    const { userID } = req.user;
+
+    const user = await User.findById(userID);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.set("pushtoken", undefined);
+    await user.save();
+
+    res.status(200).json({
+      message:
+        "You've been logged out because your account has been archived. If this is unexpected, please contact the admin.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const deactivatedUser = async (req, res) => {
   try {
     const { userID } = req.user;
@@ -279,16 +320,16 @@ export const checkCredentials = async (req, res) => {
 
     const user = await User.findOne({ username });
 
-    if (!user) {
+    if (!user || user.status === "Archived") {
       console.log("❌ Account not found");
       return res.status(404).json({
-        message: "Account not found",
+        message: "Account not found.",
       });
     }
     if (user.status === "Deactivated") {
       console.log("❌ Account is deactivated");
       return res.status(403).json({
-        message: "Account is deactivated",
+        message: "Account is deactivated.",
       });
     }
 
