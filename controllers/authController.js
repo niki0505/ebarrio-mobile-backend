@@ -11,6 +11,25 @@ configDotenv();
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
 
+export const deactivatedUser = async (req, res) => {
+  try {
+    const { userID } = req.user;
+    const user = await User.findById(userID);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.set("pushtoken", undefined);
+    await user.save();
+
+    res.status(200).json({
+      message:
+        "You've been logged out because your account has been deactivated. If this is unexpected, please contact the admin.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const checkUsername = async (req, res) => {
   try {
     const { username } = req.params;
