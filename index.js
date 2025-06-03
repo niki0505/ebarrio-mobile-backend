@@ -31,24 +31,6 @@ const io = new Server(server, {
   },
 });
 
-// io.on("connection", (socket) => {
-//   const { userID } = socket.handshake.auth;
-//   if (userID) {
-//     socket.join(userID);
-//     console.log("User joined", userID);
-//   } else {
-//     console.warn(`Socket connected without userID: ${socket.id}`);
-//   }
-
-//   socket.on("disconnect", (reason) => {
-//     console.log(`Socket disconnected: id=${socket.id}, reason=${reason}`);
-//   });
-
-//   socket.on("connect_error", (err) => {
-//     console.error(`Connection error on socket ${socket.id}:`, err);
-//   });
-// });
-
 io.adapter(createAdapter(rds, subClient));
 
 app.set("socketio", io);
@@ -66,10 +48,15 @@ rds.on("error", (err) => {
   console.error("Redis connection error: ", err);
 });
 
-cron.schedule("*/30 * * * *", () => {
-  console.log("⏰ Running rain check every 30 mins...");
+cron.schedule("* * * * *", () => {
+  console.log("⏰ Running rain check every minute...");
   checkRainForecast();
 });
+
+// cron.schedule("*/30 * * * *", () => {
+//   console.log("⏰ Running rain check every 30 mins...");
+//   checkRainForecast();
+// });
 
 cron.schedule("0 8 * * *", async () => {
   console.log("⏰ Running event check every 8 AM...");
@@ -83,15 +70,6 @@ server.listen(PORT, async () => {
     await connectDB();
     registerSocketEvents(io);
     watchAllCollectionsChanges(io);
-
-    //To check the rooms
-    // setInterval(async () => {
-    //   const rooms = await io.of("/").adapter.allRooms();
-    //   const filtered = [...rooms].filter(
-    //     (room) => !io.sockets.sockets.has(room)
-    //   );
-    //   console.log("All custom rooms across nodes:", filtered);
-    // }, 10000);
   } catch (error) {
     console.log("Error during startup:", error);
   }

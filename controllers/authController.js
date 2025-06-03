@@ -240,6 +240,12 @@ export const logoutUser = async (req, res) => {
     // user.status = "Inactive";
     // await user.save();
 
+    const user = await User.findById(userID);
+
+    user.set("pushtoken", undefined);
+    user.status = "Inactive";
+    user.save();
+
     await ActivityLog.insertOne({
       userID: userID,
       action: "Logout",
