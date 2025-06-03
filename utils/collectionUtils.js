@@ -8,6 +8,44 @@ import Notification from "../models/Notifications.js";
 import mongoose from "mongoose";
 import EmergencyHotline from "../models/EmergencyHotlines.js";
 
+export const getUsersUtils = async () => {
+  try {
+    const users = await User.find()
+      .populate({
+        path: "resID",
+        select: "firstname middlename lastname picture",
+      })
+      .populate({
+        path: "empID",
+        populate: {
+          path: "resID",
+          select: "firstname middlename lastname picture",
+        },
+      });
+    const formatDatePH = (date) => {
+      return new Date(date).toLocaleString("en-PH", {
+        timeZone: "Asia/Manila",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+    };
+
+    return users.map((user) => ({
+      ...user.toObject(),
+      createdAt: formatDatePH(user.createdAt),
+      updatedAt: formatDatePH(user.updatedAt),
+    }));
+
+    return users;
+  } catch (error) {
+    throw new Error("Error fetching users: " + error.message);
+  }
+};
+
 export const sendEventNotification = async () => {
   const db = mongoose.connection.db;
   const today = new Date();

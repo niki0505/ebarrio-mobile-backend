@@ -4,11 +4,36 @@ import {
   getAnnouncementsUtils,
   getEmergencyHotlinesUtils,
   getServicesUtils,
+  getUsersUtils,
 } from "../utils/collectionUtils.js";
-import { getEmergencyHotlines } from "./emergencyHotlines.js";
 
 export const watchAllCollectionsChanges = (io) => {
   const db = mongoose.connection.db;
+
+  // USERS (ACCOUNTS)
+  const usersChangeStream = db.collection("users").watch();
+  usersChangeStream.on("change", async (change) => {
+    console.log("Users change detected:", change);
+    if (
+      change.operationType === "update" ||
+      change.operationType === "insert"
+    ) {
+      const users = await getUsersUtils();
+      io.emit("mobile-dbChange", {
+        type: "users",
+        data: users,
+      });
+    } else if (change.operationType === "delete") {
+      io.emit("mobile-dbChange", {
+        type: "users",
+        deleted: true,
+        id: change.documentKey._id,
+      });
+    }
+  });
+  usersChangeStream.on("error", (error) => {
+    console.error("Error in users change stream:", error);
+  });
 
   // STATUS
 
