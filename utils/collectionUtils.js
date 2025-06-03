@@ -8,16 +8,6 @@ import Notification from "../models/Notifications.js";
 import mongoose from "mongoose";
 import EmergencyHotline from "../models/EmergencyHotlines.js";
 
-function processAnnouncements(announcements) {
-  return announcements
-    .filter((a) => a.status !== "Archived" && a.eventStart && a.eventEnd)
-    .map((a) => ({
-      title: a.title,
-      start: new Date(a.eventStart),
-      end: new Date(a.eventEnd),
-    }));
-}
-
 export const sendEventNotification = async () => {
   const db = mongoose.connection.db;
   const today = new Date();
@@ -25,17 +15,24 @@ export const sendEventNotification = async () => {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const todaysEvents = await db
+  const announcements = await db
     .collection("announcements")
-    .find({
-      status: { $ne: "Archived" },
-      eventStart: { $lt: tomorrow },
-      eventEnd: { $gt: today },
-    })
+    .find({ status: { $ne: "Archived" } })
     .toArray();
 
-  const processedEvents = processAnnouncements(todaysEvents);
-  if (processedEvents.length === 0) return;
+  const todaysEvents = announcements.filter((announcement) => {
+    const times = announcement.times || {};
+    for (const key in times) {
+      const start = new Date(times[key].starttime);
+      const end = new Date(times[key].endtime);
+      if (start < tomorrow && end > today) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  if (todaysEvents.length === 0) return;
 
   const users = await db
     .collection("users")
@@ -47,11 +44,11 @@ export const sendEventNotification = async () => {
     await sendPushNotification(
       user.pushtoken,
       "📅 Today's Events",
-      `The barangay have ${processedEvents.length} event(s) today!`,
+      `The barangay have ${todaysEvents.length} event(s) today!`,
       "BrgyCalendar"
     );
   }
-  console.log(`Notified users of ${processedEvents.length} event(s) today.`);
+  console.log(`Notified users of ${todaysEvents.length} event(s) today.`);
 };
 
 export const sendNotificationUpdate = async (userID, io) => {

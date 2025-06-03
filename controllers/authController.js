@@ -235,11 +235,6 @@ export const registerUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     const { userID } = req.user;
-    // const user = await User.findById(userID);
-    // if (!user) return res.status(404).json({ message: "User not found" });
-    // user.status = "Inactive";
-    // await user.save();
-
     const user = await User.findById(userID);
 
     user.set("pushtoken", undefined);
