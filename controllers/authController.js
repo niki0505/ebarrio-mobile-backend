@@ -367,7 +367,7 @@ export const checkCredentials = async (req, res) => {
         }
 
         if (attempts === 1) {
-          rds.expire(key, 30);
+          rds.expire(key, 1800);
         }
 
         await ActivityLog.insertOne({
@@ -385,7 +385,7 @@ export const checkCredentials = async (req, res) => {
           });
           return res.status(429).json({
             message:
-              "Too many failed login attempts. Please try again after 30 seconds.",
+              "Too many failed login attempts. Please try again after 30 minutes.",
           });
         }
 
