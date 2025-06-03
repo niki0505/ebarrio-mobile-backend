@@ -236,9 +236,9 @@ export const checkResident = async (req, res) => {
     const { username, firstname, lastname, mobilenumber } = req.body;
 
     const resident = await Resident.findOne({
-      firstname,
-      lastname,
-      mobilenumber,
+      firstname: { $regex: `^${firstname}$`, $options: "i" },
+      lastname: { $regex: `^${lastname}$`, $options: "i" },
+      mobilenumber: { $regex: `^${mobilenumber}$`, $options: "i" },
       empID: { $exists: false },
     });
 
