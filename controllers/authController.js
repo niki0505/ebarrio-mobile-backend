@@ -34,7 +34,7 @@ export const updatedUser = async (req, res) => {
 
 export const archivedUser = async (req, res) => {
   try {
-    const { userID } = req.user;
+    const { userID } = req.params;
 
     const user = await User.findById(userID);
     if (!user) return res.status(404).json({ message: "User not found" });

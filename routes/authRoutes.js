@@ -58,6 +58,7 @@ import {
 import { getServicesSubmitted } from "../controllers/statusController.js";
 import {
   getAllNotifications,
+  markAllAsRead,
   markAsRead,
 } from "../controllers/notificationController.js";
 
@@ -73,7 +74,7 @@ router.get("/getmobilenumber/:username", getMobileNumber);
 router.post("/checkcredentials", checkCredentials);
 router.get("/getuserdetails", authMiddleware, getUserDetails);
 router.post("/deactivateduser", authMiddleware, deactivatedUser);
-router.post("/archiveduser", authMiddleware, archivedUser);
+router.post("/archiveduser/:userID", authMiddleware, archivedUser);
 router.post("/updateduser", authMiddleware, updatedUser);
 
 router.post("/checkrefreshtoken", checkRefreshToken);
@@ -149,5 +150,6 @@ router.get("/getservices", authMiddleware, getServicesSubmitted);
 router.put("/setpushtoken", authMiddleware, setPushToken);
 router.get("/getnotifications", authMiddleware, getAllNotifications);
 router.put("/readnotification/:notifID", authMiddleware, markAsRead);
+router.put("/readnotifications", authMiddleware, markAllAsRead);
 
 export default router;
