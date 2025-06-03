@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
-import AutoIncrementFactory from "mongoose-sequence";
+const BlotterCounterSchema = new mongoose.Schema({
+  _id: String,
+  seq: Number,
+});
 
-const AutoIncrement = AutoIncrementFactory(mongoose);
+const BlotterCounter = mongoose.model("BlotterCounter", BlotterCounterSchema);
 
 const bSchema = new mongoose.Schema(
   {
@@ -75,7 +78,34 @@ const bSchema = new mongoose.Schema(
   },
   { versionKey: false, timestamps: true }
 );
-bSchema.plugin(AutoIncrement, { inc_field: "blotterno" });
+async function assignBlotterNo(doc) {
+  if (!doc.blotterno && doc.status === "Settled") {
+    const counter = await BlotterCounter.findByIdAndUpdate(
+      { _id: "blotterno" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+    doc.blotterno = counter.seq;
+  }
+}
+// Pre-save hook
+bSchema.pre("save", async function (next) {
+  try {
+    // If new document or status changed to "Issued" and certno not assigned yet
+    if (this.isNew) {
+      await assignBlotterNo(this);
+    } else if (
+      this.isModified("status") &&
+      this.status === "Settled" &&
+      !this.blotterno
+    ) {
+      await assignBlotterNo(this);
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 const Blotter = mongoose.model("Blotter", bSchema);
 
