@@ -1,6 +1,6 @@
 import Resident from "../models/Residents.js";
 import Employee from "../models/Employees.js";
-import Household from "../models/Household.js";
+import Household from "../models/Households.js";
 
 export const createResident = async (req, res) => {
   try {
