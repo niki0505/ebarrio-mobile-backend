@@ -168,6 +168,8 @@ export const createResident = async (req, res) => {
       });
       await household.save();
 
+      Resident.findByIdAndUpdate(resident._id, { householdno: household._id });
+
       // await Promise.all(
       //   members.map(({ resID }) =>
       //     Resident.findByIdAndUpdate(resID, { householdno: household._id })
