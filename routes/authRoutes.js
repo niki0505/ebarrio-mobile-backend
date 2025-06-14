@@ -35,7 +35,10 @@ import {
 } from "../controllers/courtCountroller.js";
 import { sendBlotter } from "../controllers/blotterController.js";
 import { getWeather } from "../controllers/weatherController.js";
-import { getAllResidents } from "../controllers/residentsController.js";
+import {
+  createResident,
+  getAllResidents,
+} from "../controllers/residentsController.js";
 import {
   getAnnouncements,
   heartAnnouncement,
@@ -151,5 +154,8 @@ router.put("/setpushtoken", authMiddleware, setPushToken);
 router.get("/getnotifications", authMiddleware, getAllNotifications);
 router.put("/readnotification/:notifID", authMiddleware, markAsRead);
 router.put("/readnotifications", authMiddleware, markAllAsRead);
+
+//RESIDENTS FORM
+router.post("/createresident", createResident);
 
 export default router;

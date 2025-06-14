@@ -158,6 +158,67 @@ const resSchema = new mongoose.Schema(
     course: {
       type: String,
     },
+    status: {
+      type: String,
+      enum: ["Active", "Archived", "Pending"],
+      required: true,
+      default: "Pending",
+    },
+    is4Ps: {
+      type: Boolean,
+      default: false,
+    },
+    isSenior: {
+      type: Boolean,
+      default: false,
+    },
+    isInfant: {
+      type: Boolean,
+      default: false,
+    },
+    isChild: {
+      type: Boolean,
+      default: false,
+    },
+    isPregnant: {
+      type: Boolean,
+      default: false,
+    },
+    isPWD: {
+      type: Boolean,
+      default: false,
+    },
+    isSoloParent: {
+      type: Boolean,
+      default: false,
+    },
+    philhealthid: { type: String },
+    philhealthtype: { type: String },
+    philhealthcategory: { type: String },
+    haveHypertension: {
+      type: Boolean,
+      default: false,
+    },
+    haveDiabetes: {
+      type: Boolean,
+      default: false,
+    },
+    haveTubercolosis: {
+      type: Boolean,
+      default: false,
+    },
+    haveSurgery: {
+      type: Boolean,
+      default: false,
+    },
+    lastmenstrual: { type: String },
+    haveFPmethod: {
+      type: Boolean,
+      default: false,
+    },
+    fpmethod: { type: String },
+    fpstatus: { type: String },
+    householdno: { type: mongoose.Schema.Types.ObjectId, ref: "Household" },
     userID: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     empID: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
   },
