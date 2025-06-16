@@ -182,7 +182,6 @@ export const createResident = async (req, res) => {
         const household = await Household.findById(householdno);
         if (household) {
           resident.set("householdno", householdno);
-          resident.set("householdposition", householdposition);
 
           const alreadyMember = household.members.some(
             (m) => m.resID.toString() === resident._id.toString()
