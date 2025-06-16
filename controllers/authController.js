@@ -246,6 +246,12 @@ export const checkResident = async (req, res) => {
       return res.status(404).json({ message: "Resident not found" });
     }
 
+    if (resident && resident.status === "Pending") {
+      return res
+        .status(404)
+        .json({ message: "Your resident profile is still pending approval." });
+    }
+
     if (resident.userID && resident) {
       return res
         .status(409)
