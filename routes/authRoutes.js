@@ -64,6 +64,7 @@ import {
   markAllAsRead,
   markAsRead,
 } from "../controllers/notificationController.js";
+import { getAllHousehold } from "../controllers/householdController.js";
 
 const router = express.Router();
 
@@ -157,5 +158,6 @@ router.put("/readnotifications", authMiddleware, markAllAsRead);
 
 //RESIDENTS FORM
 router.post("/createresident", createResident);
+router.get("/gethouseholds", getAllHousehold);
 
 export default router;
