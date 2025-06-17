@@ -164,10 +164,6 @@ const resSchema = new mongoose.Schema(
       required: true,
       default: "Pending",
     },
-    is4Ps: {
-      type: Boolean,
-      default: false,
-    },
     isSenior: {
       type: Boolean,
       default: false,
@@ -176,7 +172,35 @@ const resSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    isChild: {
+    isNewborn: {
+      type: Boolean,
+      default: false,
+    },
+    isUnder5: {
+      type: Boolean,
+      default: false,
+    },
+    isSchoolAge: {
+      type: Boolean,
+      default: false,
+    },
+    isAdolescent: {
+      type: Boolean,
+      default: false,
+    },
+    isAdolescentPregnant: {
+      type: Boolean,
+      default: false,
+    },
+    isAdult: {
+      type: Boolean,
+      default: false,
+    },
+    isPostpartum: {
+      type: Boolean,
+      default: false,
+    },
+    isWomenOfReproductive: {
       type: Boolean,
       default: false,
     },
@@ -185,10 +209,6 @@ const resSchema = new mongoose.Schema(
       default: false,
     },
     isPWD: {
-      type: Boolean,
-      default: false,
-    },
-    isSoloParent: {
       type: Boolean,
       default: false,
     },
@@ -213,8 +233,7 @@ const resSchema = new mongoose.Schema(
     },
     lastmenstrual: { type: String },
     haveFPmethod: {
-      type: Boolean,
-      default: false,
+      type: String,
     },
     fpmethod: { type: String },
     fpstatus: { type: String },
