@@ -1,23 +1,23 @@
-# fly.toml app configuration file generated for ebarrio-mobile-backend on 2025-07-13T07:29:55Z
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
+app = "ebarrio-mobile-backend"
+primary_region = "cdg"
 
-app = 'ebarrio-mobile-backend'
-primary_region = 'cdg'
-
-[build]
+[env]
+  PORT="4000"
+  DATABASE_URL="mongodb+srv://knicole:admin1234@cluster0.l40pk.mongodb.net/eBarrio?retryWrites=true&w=majority&appName=Cluster0"
+  ACCESS_SECRET="myaccesssecret"
+  REFRESH_SECRET="myrefreshsecret"
+  WEATHER_API_KEY="d371a6b96c054b99a9340533250505"
+  REDIS_URL = "rediss://default:8371acac08424457a591b90d01c5a45c@gusc1-trusting-akita-31569.upstash.io:31569"
 
 [http_service]
-  internal_port = 3000
+  internal_port = 4000
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = "stop"
   auto_start_machines = true
   min_machines_running = 0
-  processes = ['app']
+  processes = ["app"]
 
 [[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
+  memory = "1gb"
+  cpu_kind = "shared"
   cpus = 1
-  memory_mb = 1024
