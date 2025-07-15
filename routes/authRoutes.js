@@ -65,6 +65,7 @@ import {
   markAsRead,
 } from "../controllers/notificationController.js";
 import { getAllHousehold } from "../controllers/householdController.js";
+import { getLatestSnapshot } from "../controllers/snapshotController.js";
 
 const router = express.Router();
 
@@ -160,4 +161,6 @@ router.put("/readnotifications", authMiddleware, markAllAsRead);
 router.post("/createresident", createResident);
 router.get("/gethouseholds", getAllHousehold);
 
+//SNAPSHOTS
+router.get("/latestsnapshot", getLatestSnapshot);
 export default router;
