@@ -163,4 +163,7 @@ router.get("/gethouseholds", getAllHousehold);
 
 //SNAPSHOTS
 router.get("/latestsnapshot", getLatestSnapshot);
+
+//FAQs
+router.get("/getfaqs", authMiddleware, getFAQs);
 export default router;
