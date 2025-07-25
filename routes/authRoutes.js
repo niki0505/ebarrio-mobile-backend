@@ -66,6 +66,7 @@ import {
 } from "../controllers/notificationController.js";
 import { getAllHousehold } from "../controllers/householdController.js";
 import { getLatestSnapshot } from "../controllers/snapshotController.js";
+import { getFAQs } from "../controllers/chatController.js";
 
 const router = express.Router();
 
