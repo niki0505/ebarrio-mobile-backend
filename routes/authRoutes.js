@@ -66,7 +66,7 @@ import {
 } from "../controllers/notificationController.js";
 import { getAllHousehold } from "../controllers/householdController.js";
 import { getLatestSnapshot } from "../controllers/snapshotController.js";
-import { getFAQs } from "../controllers/chatController.js";
+import { getActive, getFAQs } from "../controllers/chatController.js";
 
 const router = express.Router();
 
@@ -167,4 +167,5 @@ router.get("/latestsnapshot", getLatestSnapshot);
 
 //FAQs
 router.get("/getfaqs", authMiddleware, getFAQs);
+router.get("/getactive", authMiddleware, getActive);
 export default router;
