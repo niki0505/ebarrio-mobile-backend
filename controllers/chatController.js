@@ -1,5 +1,26 @@
 import FAQ from "../models/FAQs.js";
 import User from "../models/Users.js";
+import Chat from "../models/Chats.js";
+
+export const getChatHistory = async (req, res) => {
+  try {
+    const { userID } = req.user;
+
+    const history = await Chat.find({
+      participants: userID,
+      isCleared: { $ne: true },
+    })
+      .populate("participants", "firstname lastname picture") // populate participant names and roles
+      .populate("responder", "firstname lastname picture") // optional: staff info
+      .populate("messages.from", "firstname lastname picture") // show sender's name
+      .populate("messages.to", "firstname lastname picture"); // show recipient's name
+
+    return res.status(200).json(history);
+  } catch (error) {
+    console.error("Error getting chat history:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export const getActive = async (req, res) => {
   try {
