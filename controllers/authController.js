@@ -185,6 +185,7 @@ export const refreshAccessToken = (req, res) => {
             role: decodedRefresh.role,
             name: decodedRefresh.name,
             picture: decodedRefresh.picture,
+            username: decodedRefresh.username,
           },
           process.env.ACCESS_SECRET,
           {
@@ -433,7 +434,11 @@ export const loginUser = async (req, res) => {
     const resID =
       user?.resID?._id?.toString() || user?.empID?.resID?._id?.toString();
     const name =
-      user?.resID?.firstname || user?.empID?.resID?.firstname || "Unknown";
+      user?.resID?.firstname && user?.resID?.lastname
+        ? `${user.resID.firstname} ${user.resID.lastname}`
+        : user?.empID?.resID?.firstname && user?.empID?.resID?.lastname
+        ? `${user.empID.resID.firstname} ${user.empID.resID.lastname}`
+        : "Unknown";
     const picture = user?.resID?.picture || user?.empID?.resID?.picture || null;
     const role = user?.role;
 
@@ -444,6 +449,7 @@ export const loginUser = async (req, res) => {
         role,
         name,
         picture,
+        username,
       },
       ACCESS_SECRET,
       {
@@ -458,6 +464,7 @@ export const loginUser = async (req, res) => {
         role,
         name,
         picture,
+        username,
       },
       REFRESH_SECRET,
       {
