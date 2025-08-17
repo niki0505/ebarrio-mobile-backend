@@ -70,7 +70,7 @@ export const checkRainForecast = async () => {
           await sendPushNotification(
             element.pushtoken,
             `🌧️ Weather Alert`,
-            "It's starting rain now. Stay safe!",
+            "It's starting to rain now. Stay safe!",
             "Weather"
           );
         }
