@@ -71,6 +71,7 @@ import {
   getChatHistory,
   getFAQs,
 } from "../controllers/chatController.js";
+import { sendSOS } from "../controllers/SOSController.js";
 
 const router = express.Router();
 
@@ -173,4 +174,7 @@ router.get("/latestsnapshot", getLatestSnapshot);
 router.get("/getfaqs", authMiddleware, getFAQs);
 router.get("/getactive", authMiddleware, getActive);
 router.get("/getchat", authMiddleware, getChatHistory);
+
+//SOS
+router.post("/sendsos", authMiddleware, sendSOS);
 export default router;

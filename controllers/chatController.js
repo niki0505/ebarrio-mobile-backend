@@ -42,7 +42,7 @@ export const getActive = async (req, res) => {
 
 export const getFAQs = async (req, res) => {
   try {
-    const faqs = await FAQ.find();
+    const faqs = await FAQ.find({ status: "Active" });
 
     return res.status(200).json(faqs);
   } catch (error) {
