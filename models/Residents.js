@@ -118,28 +118,6 @@ const resSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    address: {
-      type: String,
-      required: true,
-    },
-    mother: { type: mongoose.Schema.Types.ObjectId, ref: "Resident" },
-    father: { type: mongoose.Schema.Types.ObjectId, ref: "Resident" },
-    spouse: { type: mongoose.Schema.Types.ObjectId, ref: "Resident" },
-    siblings: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Resident",
-      },
-    ],
-    children: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Resident",
-      },
-    ],
-    HOAname: {
-      type: String,
-    },
     employmentstatus: {
       type: String,
     },
@@ -152,15 +130,12 @@ const resSchema = new mongoose.Schema(
     educationalattainment: {
       type: String,
     },
-    typeofschool: {
-      type: String,
-    },
     course: {
       type: String,
     },
     status: {
       type: String,
-      enum: ["Active", "Archived", "Pending"],
+      enum: ["Active", "Archived", "Pending", "Change Requested"],
       required: true,
       default: "Pending",
     },

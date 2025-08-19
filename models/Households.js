@@ -62,6 +62,13 @@ const hSchema = new mongoose.Schema(
       required: true,
       default: "Pending",
     },
+    address: {
+      type: String,
+      required: true,
+    },
+    HOAname: {
+      type: String,
+    },
     ethnicity: { type: String, required: true },
     tribe: { type: String },
     sociostatus: { type: String, required: true },
