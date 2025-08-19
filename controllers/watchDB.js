@@ -243,7 +243,9 @@ export const watchAllCollectionsChanges = (io) => {
   });
 
   // ANNOUNCEMENTS
-  const notifChangeStream = db.collection("notifications").watch();
+  const notifChangeStream = db.collection("notifications").watch([], {
+    fullDocument: "updateLookup",
+  });
 
   notifChangeStream.on("change", async (change) => {
     console.log("Notifications change detected:", change);
@@ -282,7 +284,7 @@ export const watchAllCollectionsChanges = (io) => {
     }
   });
 
-  emergencyhotlinesChangeStream.on("error", (error) => {
+  notifChangeStream.on("error", (error) => {
     console.error("Error in change stream:", error);
   });
 
