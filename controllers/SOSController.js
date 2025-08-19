@@ -1,5 +1,31 @@
 import SOS from "../models/SOS.js";
 
+export const arrivedSOS = async (req, res) => {
+  try {
+    const { empID } = req.user;
+    const { reportID } = req.params;
+    const report = await SOS.findById(reportID);
+
+    const responder = report.responder.find(
+      (rep) => rep.empID.toString() === empID
+    );
+
+    if (!responder) {
+      return res.status(400).json({ message: "You are not a responder yet" });
+    }
+
+    responder.status = "Arrived";
+    responder.arrivedat = new Date();
+
+    await report.save();
+
+    return res.status(200).json({ message: "You arrived to the SOS report" });
+  } catch (error) {
+    console.error("Error get pending SOS:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const headingSOS = async (req, res) => {
   try {
     const { empID } = req.user;

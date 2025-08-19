@@ -72,6 +72,7 @@ import {
   getFAQs,
 } from "../controllers/chatController.js";
 import {
+  arrivedSOS,
   getActiveSOS,
   getPendingSOS,
   headingSOS,
@@ -185,4 +186,5 @@ router.post("/sendsos", authMiddleware, sendSOS);
 router.get("/getactivesos", authMiddleware, getActiveSOS);
 router.get("/getpendingsos", authMiddleware, getPendingSOS);
 router.put("/headingsos/:reportID", authMiddleware, headingSOS);
+router.put("/arrivedsos/:reportID", authMiddleware, arrivedSOS);
 export default router;
