@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 import {
   findUserIDByResID,
+  getAllNotificationsUtils,
   getAnnouncementsUtils,
   getEmergencyHotlinesUtils,
   getServicesUtils,
   getUnreadNotifications,
   getUsersUtils,
 } from "../utils/collectionUtils.js";
-import { getAllNotifications } from "./notificationController.js";
 
 export const watchAllCollectionsChanges = (io) => {
   const db = mongoose.connection.db;
@@ -259,7 +259,7 @@ export const watchAllCollectionsChanges = (io) => {
         type: "unreadnotifications",
         data: unreadnotifications,
       });
-      const notifications = await getAllNotifications(changedDoc.userID);
+      const notifications = await getAllNotificationsUtils(changedDoc.userID);
       io.emit("mobile-dbChange", {
         type: "notifications",
         data: notifications,
@@ -272,7 +272,7 @@ export const watchAllCollectionsChanges = (io) => {
         type: "unreadnotifications",
         data: unreadnotifications,
       });
-      const notifications = await getAllNotifications(changedDoc.userID);
+      const notifications = await getAllNotificationsUtils(changedDoc.userID);
       io.emit("mobile-dbChange", {
         type: "notifications",
         data: notifications,

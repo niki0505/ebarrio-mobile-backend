@@ -8,7 +8,7 @@ import Notification from "../models/Notifications.js";
 import mongoose from "mongoose";
 import EmergencyHotline from "../models/EmergencyHotlines.js";
 
-export const getAllNotifications = async (userID) => {
+export const getAllNotificationsUtils = async (userID) => {
   try {
     const notifs = await Notification.find({
       userID: userID,

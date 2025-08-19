@@ -1,5 +1,8 @@
 import Notification from "../models/Notifications.js";
-import { sendNotificationUpdate } from "../utils/collectionUtils.js";
+import {
+  getAllNotificationsUtils,
+  sendNotificationUpdate,
+} from "../utils/collectionUtils.js";
 
 export const markAllAsRead = async (req, res) => {
   try {
@@ -43,7 +46,7 @@ export const markAsRead = async (req, res) => {
 export const getAllNotifications = async (req, res) => {
   try {
     const { userID } = req.user;
-    const notifications = await getAllNotifications(userID);
+    const notifications = await getAllNotificationsUtils(userID);
     if (!notifications) {
       res.status(404).json({ message: "Notifications not found" });
     }
