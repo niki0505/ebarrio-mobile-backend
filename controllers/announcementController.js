@@ -5,6 +5,7 @@ import { sendNotificationUpdate } from "../utils/collectionUtils.js";
 import Resident from "../models/Residents.js";
 import User from "../models/Users.js";
 import ActivityLog from "../models/ActivityLogs.js";
+import Employee from "../models/Employees.js";
 
 export const unheartAnnouncement = async (req, res) => {
   try {
@@ -49,7 +50,7 @@ export const unheartAnnouncement = async (req, res) => {
 export const heartAnnouncement = async (req, res) => {
   try {
     const { announcementID } = req.params;
-    const userID = req.user.userID;
+    const { userID, role } = req.user;
     const announcement = await Announcement.findById(announcementID);
 
     announcement.hearts = announcement.hearts + 1;
@@ -57,24 +58,38 @@ export const heartAnnouncement = async (req, res) => {
 
     await announcement.save();
 
-    const resident = await Resident.findOne({ userID: userID }).select(
-      "firstname lastname"
-    );
+    let likerName = "Someone";
 
+    if (role === "Resident") {
+      const resident = await Resident.findOne({ userID }).select(
+        "firstname lastname"
+      );
+      if (resident) {
+        likerName = `${resident.firstname} ${resident.lastname}`;
+      }
+    } else if (role === "Official") {
+      const employee = await Employee.findOne({ userID });
+      const resident = await Resident.findById(employee.resID).select(
+        "firstname lastname"
+      );
+      if (employee) {
+        likerName = `${resident.firstname} ${resident.lastname}`;
+      }
+    }
     const user = await User.findOne({ empID: announcement.uploadedby });
 
     const io = req.app.get("socketio");
 
     io.to(user._id).emit("announcement", {
       title: `❤️ ${announcement.title}`,
-      message: `${resident.firstname} ${resident.lastname} liked your post`,
+      message: `${likerName} liked your post`,
       timestamp: announcement.updatedAt,
     });
 
     const notification = {
       userID: user._id,
       title: `❤️ ${announcement.title}`,
-      message: `${resident.firstname} ${resident.lastname} liked your post`,
+      message: `${likerName} liked your post`,
       redirectTo: "/announcements",
       announcementID: announcement._id,
     };
