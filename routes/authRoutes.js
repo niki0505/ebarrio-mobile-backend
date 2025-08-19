@@ -78,7 +78,7 @@ import {
   headingSOS,
   sendSOS,
 } from "../controllers/SOSController.js";
-import { getProfile } from "../controllers/profileController.js";
+import { getHousehold, getProfile } from "../controllers/profileController.js";
 
 const router = express.Router();
 
@@ -191,4 +191,5 @@ router.put("/arrivedsos/:reportID", authMiddleware, arrivedSOS);
 
 //PROFILE
 router.get("/getprofile", authMiddleware, getProfile);
+router.get("/gethousehold/:householdID", authMiddleware, getHousehold);
 export default router;
