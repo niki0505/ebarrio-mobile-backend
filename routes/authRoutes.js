@@ -170,7 +170,7 @@ router.put("/setpushtoken", authMiddleware, setPushToken);
 router.get("/getnotifications", authMiddleware, getAllNotifications);
 router.put("/readnotification/:notifID", authMiddleware, markAsRead);
 router.put("/readnotifications", authMiddleware, markAllAsRead);
-router.put("/getunreadnotifications", authMiddleware, unreadNotifications);
+router.get("/getunreadnotifications", authMiddleware, unreadNotifications);
 
 //RESIDENTS FORM
 router.post("/createresident", createResident);
