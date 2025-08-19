@@ -36,6 +36,10 @@ const sSchema = new mongoose.Schema(
           type: Date,
           default: null,
         },
+        isHead: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
     postreportdetails: { type: String },
