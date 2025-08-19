@@ -233,6 +233,7 @@ export const getAllResidents = async (req, res) => {
     const residents = await Resident.find()
       .select("-empID")
       .populate("empID")
+      .populate("householdno")
       .exec();
     res.status(200).json(residents);
   } catch (error) {

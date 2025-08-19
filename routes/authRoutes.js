@@ -78,6 +78,7 @@ import {
   headingSOS,
   sendSOS,
 } from "../controllers/SOSController.js";
+import { getProfile } from "../controllers/profileController.js";
 
 const router = express.Router();
 
@@ -187,4 +188,7 @@ router.get("/getactivesos", authMiddleware, getActiveSOS);
 router.get("/getpendingsos", authMiddleware, getPendingSOS);
 router.put("/headingsos/:reportID", authMiddleware, headingSOS);
 router.put("/arrivedsos/:reportID", authMiddleware, arrivedSOS);
+
+//PROFILE
+router.get("/getprofile", authMiddleware, getProfile);
 export default router;
