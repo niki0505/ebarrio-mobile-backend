@@ -74,6 +74,7 @@ import {
 import {
   getActiveSOS,
   getPendingSOS,
+  headingSOS,
   sendSOS,
 } from "../controllers/SOSController.js";
 
@@ -183,4 +184,5 @@ router.get("/getchat", authMiddleware, getChatHistory);
 router.post("/sendsos", authMiddleware, sendSOS);
 router.get("/getactivesos", authMiddleware, getActiveSOS);
 router.get("/getpendingsos", authMiddleware, getPendingSOS);
+router.put("/headingsos", authMiddleware, headingSOS);
 export default router;
