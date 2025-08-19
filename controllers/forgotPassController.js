@@ -74,7 +74,9 @@ export const verifySecurityQuestion = async (req, res) => {
     if (isMatch) {
       res.status(200).json({ message: "Security question is verified" });
     } else {
-      return res.status(400).json({ message: "Incorrect answer" });
+      return res.status(400).json({
+        message: "We couldn’t verify your answer. Please check and try again.",
+      });
     }
   } catch (error) {
     console.log("Error verifying security question", error);
@@ -98,7 +100,9 @@ export const checkUser = async (req, res) => {
       .populate({ path: "resID", select: "mobilenumber" });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found!" });
+      return res.status(404).json({
+        message: "No account found. Please check your credentials.",
+      });
     }
 
     res.status(200).json(user);

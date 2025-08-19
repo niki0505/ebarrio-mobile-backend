@@ -42,9 +42,8 @@ export const markAsRead = async (req, res) => {
 
 export const getAllNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find({
-      userID: req.user.userID,
-    });
+    const { userID } = req.user;
+    const notifications = await getAllNotifications(userID);
     if (!notifications) {
       res.status(404).json({ message: "Notifications not found" });
     }

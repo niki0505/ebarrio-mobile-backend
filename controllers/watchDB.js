@@ -4,8 +4,10 @@ import {
   getAnnouncementsUtils,
   getEmergencyHotlinesUtils,
   getServicesUtils,
+  getUnreadNotifications,
   getUsersUtils,
 } from "../utils/collectionUtils.js";
+import { getAllNotifications } from "./notificationController.js";
 
 export const watchAllCollectionsChanges = (io) => {
   const db = mongoose.connection.db;
@@ -230,6 +232,50 @@ export const watchAllCollectionsChanges = (io) => {
     } else if (change.operationType === "delete") {
       io.emit("mobile-dbChange", {
         type: "emergencyhotlines",
+        deleted: true,
+        id: change.documentKey._id,
+      });
+    }
+  });
+
+  emergencyhotlinesChangeStream.on("error", (error) => {
+    console.error("Error in change stream:", error);
+  });
+
+  // ANNOUNCEMENTS
+  const notifChangeStream = db.collection("notifications").watch();
+
+  notifChangeStream.on("change", async (change) => {
+    console.log("Notifications change detected:", change);
+    const changedDoc = change.fullDocument;
+    if (
+      change.operationType === "update" ||
+      change.operationType === "insert"
+    ) {
+      const unreadnotifications = await getUnreadNotifications(
+        changedDoc.userID
+      );
+      io.emit("mobile-dbChange", {
+        type: "unreadnotifications",
+        data: unreadnotifications,
+      });
+      const notifications = await getAllNotifications(changedDoc.userID);
+      io.emit("mobile-dbChange", {
+        type: "notifications",
+        data: notifications,
+      });
+    } else if (change.operationType === "delete") {
+      const unreadnotifications = await getUnreadNotifications(
+        changedDoc.userID
+      );
+      io.emit("mobile-dbChange", {
+        type: "unreadnotifications",
+        data: unreadnotifications,
+      });
+      const notifications = await getAllNotifications(changedDoc.userID);
+      io.emit("mobile-dbChange", {
+        type: "notifications",
+        data: notifications,
         deleted: true,
         id: change.documentKey._id,
       });

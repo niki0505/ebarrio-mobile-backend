@@ -8,6 +8,30 @@ import Notification from "../models/Notifications.js";
 import mongoose from "mongoose";
 import EmergencyHotline from "../models/EmergencyHotlines.js";
 
+export const getAllNotifications = async (userID) => {
+  try {
+    const notifs = await Notification.find({
+      userID: userID,
+    });
+    return notifs;
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    return 0;
+  }
+};
+
+export const getUnreadNotifications = async (userID) => {
+  try {
+    const count = await Notification.countDocuments({
+      read: false,
+      userID: userID,
+    });
+    return count;
+  } catch (error) {
+    console.error("Error fetching unread notifications:", error);
+    return 0;
+  }
+};
 export const getUsersUtils = async () => {
   try {
     const users = await User.find()

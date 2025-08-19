@@ -65,7 +65,9 @@ export const changeSecurityQuestions = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: "Incorrect password" });
+      return res
+        .status(400)
+        .json({ message: "Hmm… that password didn’t work. Let’s try again." });
     }
 
     if (securityquestions[0]) {
@@ -102,7 +104,9 @@ export const changePassword = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: "Incorrect current password" });
+      return res
+        .status(400)
+        .json({ message: "Hmm… that password didn’t work. Let’s try again." });
     }
 
     user.password = newpassword;

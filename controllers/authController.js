@@ -400,7 +400,7 @@ export const checkCredentials = async (req, res) => {
         }
 
         return res.status(403).json({
-          message: "Invalid credentials.",
+          message: "Kindly check your details and try again.",
         });
       });
       return;
