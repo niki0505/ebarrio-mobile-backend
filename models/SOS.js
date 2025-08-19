@@ -42,6 +42,9 @@ const sSchema = new mongoose.Schema(
         },
       },
     ],
+    evidence: {
+      type: String,
+    },
     postreportdetails: { type: String },
     status: {
       type: String,

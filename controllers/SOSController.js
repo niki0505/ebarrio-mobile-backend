@@ -47,6 +47,8 @@ export const headingSOS = async (req, res) => {
       isHead,
     });
 
+    report.status = "Ongoing";
+
     await report.save();
 
     return res
@@ -86,7 +88,7 @@ export const getActiveSOS = async (req, res) => {
       resID: resID,
     }).populate({
       path: "responder.empID",
-      select: "resID",
+      select: "resID position",
       populate: {
         path: "resID",
         select: "firstname lastname mobilenumber picture",
