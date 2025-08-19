@@ -1,5 +1,37 @@
 import SOS from "../models/SOS.js";
 
+export const headingSOS = async (req, res) => {
+  try {
+    const { empID } = req.user;
+    const { reportID } = req.params;
+    const report = await SOS.findById(reportID);
+    const alreadyResponder = report.responder.some(
+      (r) => r.empID.toString() === empID
+    );
+    if (alreadyResponder) {
+      return res.status(400).json({ message: "You are already a responder" });
+    }
+
+    const isHead = report.responder.length === 0;
+
+    report.responder.push({
+      empID,
+      status: "Heading",
+      arrivedat: null,
+      isHead,
+    });
+
+    await report.save();
+
+    return res
+      .status(200)
+      .json({ message: "You are now heading to the SOS report" });
+  } catch (error) {
+    console.error("Error get pending SOS:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const getPendingSOS = async (req, res) => {
   try {
     const reports = await SOS.find({

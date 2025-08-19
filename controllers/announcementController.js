@@ -20,16 +20,31 @@ export const unheartAnnouncement = async (req, res) => {
 
     await announcement.save();
 
-    const resident = await Resident.findOne({ userID: userID }).select(
-      "firstname lastname"
-    );
+    let likerName = "Someone";
+
+    if (role === "Resident") {
+      const resident = await Resident.findOne({ userID }).select(
+        "firstname lastname"
+      );
+      if (resident) {
+        likerName = `${resident.firstname} ${resident.lastname}`;
+      }
+    } else if (role === "Official") {
+      const employee = await Employee.findOne({ userID });
+      const resident = await Resident.findById(employee.resID).select(
+        "firstname lastname"
+      );
+      if (employee) {
+        likerName = `${resident.firstname} ${resident.lastname}`;
+      }
+    }
     const io = req.app.get("socketio");
 
     const user = await User.findOne({ empID: announcement.uploadedby });
 
     await Notification.deleteOne({
       announcementID: announcement._id,
-      message: `${resident.firstname} ${resident.lastname} liked your post`,
+      message: `${likerName} liked your post`,
     });
 
     sendNotificationUpdate(user._id.toString(), io);

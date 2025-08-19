@@ -186,6 +186,7 @@ export const refreshAccessToken = (req, res) => {
             name: decodedRefresh.name,
             picture: decodedRefresh.picture,
             username: decodedRefresh.username,
+            empID: decodedRefresh.empID,
           },
           process.env.ACCESS_SECRET,
           {
@@ -441,6 +442,7 @@ export const loginUser = async (req, res) => {
         : "Unknown";
     const picture = user?.resID?.picture || user?.empID?.resID?.picture || null;
     const role = user?.role;
+    const empID = user?.empID?._id?.toString() || null;
 
     const accessToken = jwt.sign(
       {
@@ -450,6 +452,7 @@ export const loginUser = async (req, res) => {
         name,
         picture,
         username,
+        empID,
       },
       ACCESS_SECRET,
       {
@@ -465,6 +468,7 @@ export const loginUser = async (req, res) => {
         name,
         picture,
         username,
+        empID,
       },
       REFRESH_SECRET,
       {
