@@ -6,7 +6,7 @@ import axios from "axios";
 export async function alertResidents(req, res) {
   try {
     const { userID } = req.user;
-    const { message } = req.body;
+    const { alertResidentsMessage } = req.body;
 
     const cooldown = await rds.get("limitAlert");
     if (cooldown) {
@@ -26,7 +26,7 @@ export async function alertResidents(req, res) {
       axios.post("https://api.semaphore.co/api/v4/priority", {
         apikey: "46d791fbe4e880554fcad1ee958bbf33",
         number: resident.mobilenumber,
-        message: message,
+        message: alertResidentsMessage,
       })
     );
 
