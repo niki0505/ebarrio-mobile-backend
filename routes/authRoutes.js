@@ -66,7 +66,10 @@ import {
   unreadNotifications,
 } from "../controllers/notificationController.js";
 import { getAllHousehold } from "../controllers/householdController.js";
-import { getLatestSnapshot } from "../controllers/snapshotController.js";
+import {
+  alertResidents,
+  getLatestSnapshot,
+} from "../controllers/snapshotController.js";
 import {
   getActive,
   getChatHistory,
@@ -178,6 +181,7 @@ router.get("/gethouseholds", getAllHousehold);
 
 //SNAPSHOTS
 router.get("/latestsnapshot", getLatestSnapshot);
+router.post("/alertresidents", authMiddleware, alertResidents);
 
 //FAQs
 router.get("/getfaqs", authMiddleware, getFAQs);
