@@ -1,6 +1,7 @@
 import { bucket } from "../firebaseAdmin.js";
 import { rds } from "../index.js";
 import Resident from "../models/Residents.js";
+import axios from "axios";
 
 export async function alertResidents(req, res) {
   try {
