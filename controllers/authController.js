@@ -240,13 +240,16 @@ export const checkResident = async (req, res) => {
     const { username, firstname, lastname, mobilenumber } = req.body;
 
     const resident = await Resident.findOne({
-      firstname: { $regex: `^${firstname}$`, $options: "i" },
-      lastname: { $regex: `^${lastname}$`, $options: "i" },
-      mobilenumber: { $regex: `^${mobilenumber}$`, $options: "i" },
+      $expr: {
+        $and: [
+          { $eq: [{ $toLower: "$firstname" }, firstname.toLowerCase().trim()] },
+          { $eq: [{ $toLower: "$lastname" }, lastname.toLowerCase().trim()] },
+          { $eq: ["$mobilenumber", mobilenumber.trim()] }, // exact match
+        ],
+      },
       empID: { $exists: false },
+      status: { $in: ["Active"] },
     });
-
-    console.log(resident);
 
     if (!resident) {
       return res.status(404).json({ message: "Resident not found" });
