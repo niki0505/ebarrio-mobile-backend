@@ -79,6 +79,7 @@ import {
   arrivedSOS,
   getActiveSOS,
   getPendingSOS,
+  getRespondedSOS,
   headingSOS,
   sendSOS,
   submitPostIncident,
@@ -196,6 +197,7 @@ router.get("/getpendingsos", authMiddleware, getPendingSOS);
 router.put("/headingsos/:reportID", authMiddleware, headingSOS);
 router.put("/arrivedsos/:reportID", authMiddleware, arrivedSOS);
 router.put("/postincident/:reportID", authMiddleware, submitPostIncident);
+router.get("/getrespondedsos", authMiddleware, getRespondedSOS);
 
 //PROFILE
 router.get("/getprofile", authMiddleware, getProfile);

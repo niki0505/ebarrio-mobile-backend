@@ -1,5 +1,18 @@
 import SOS from "../models/SOS.js";
 
+export const getRespondedSOS = async (req, res) => {
+  try {
+    const { empID } = req.user;
+    const reports = await SOS.find({
+      "responder.empID": empID,
+    });
+    return res.status(200).json(reports);
+  } catch (error) {
+    console.error("Error get responded SOS:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const submitPostIncident = async (req, res) => {
   try {
     const { reportID } = req.params;
