@@ -244,11 +244,10 @@ export const checkResident = async (req, res) => {
         $and: [
           { $eq: [{ $toLower: "$firstname" }, firstname.toLowerCase().trim()] },
           { $eq: [{ $toLower: "$lastname" }, lastname.toLowerCase().trim()] },
-          { $eq: ["$mobilenumber", mobilenumber.trim()] }, // exact match
+          { $eq: ["$mobilenumber", mobilenumber.trim()] },
         ],
       },
       empID: { $exists: false },
-      status: { $in: ["Active"] },
     });
 
     if (!resident) {
