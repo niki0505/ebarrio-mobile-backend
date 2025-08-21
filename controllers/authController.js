@@ -151,7 +151,6 @@ export const verifyOTP = async (req, res) => {
 export const sendOTP = async (req, res) => {
   try {
     const { username, mobilenumber } = req.body;
-    console.log(username, mobilenumber);
     const response = await axios.post("https://api.semaphore.co/api/v4/otp", {
       apikey: "46d791fbe4e880554fcad1ee958bbf33",
       number: mobilenumber,

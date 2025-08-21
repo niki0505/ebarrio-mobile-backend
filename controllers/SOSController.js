@@ -20,6 +20,28 @@ export const getRespondedSOS = async (req, res) => {
   }
 };
 
+export const submitFalseAlarm = async (req, res) => {
+  try {
+    const { reportID } = req.params;
+    const { falseAlarmForm } = req.body;
+
+    const report = await SOS.findById(reportID);
+
+    report.postreportdetails = falseAlarmForm.postreportdetails;
+    report.evidence = falseAlarmForm.evidence;
+    report.status = "False Alarm";
+
+    await report.save();
+
+    return res
+      .status(200)
+      .json({ message: "False alarm report submitted successfully" });
+  } catch (error) {
+    console.error("Error submitting false alarm report:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const submitPostIncident = async (req, res) => {
   try {
     const { reportID } = req.params;
@@ -37,7 +59,7 @@ export const submitPostIncident = async (req, res) => {
       .status(200)
       .json({ message: "Post incident report submitted successfully" });
   } catch (error) {
-    console.error("Error get pending SOS:", error);
+    console.error("Error submitting post incident report:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
