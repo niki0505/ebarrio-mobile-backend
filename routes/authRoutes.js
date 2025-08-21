@@ -81,6 +81,7 @@ import {
   getPendingSOS,
   headingSOS,
   sendSOS,
+  submitPostIncident,
 } from "../controllers/SOSController.js";
 import { getHousehold, getProfile } from "../controllers/profileController.js";
 
@@ -194,6 +195,7 @@ router.get("/getactivesos", authMiddleware, getActiveSOS);
 router.get("/getpendingsos", authMiddleware, getPendingSOS);
 router.put("/headingsos/:reportID", authMiddleware, headingSOS);
 router.put("/arrivedsos/:reportID", authMiddleware, arrivedSOS);
+router.put("/postincident/:reportID", authMiddleware, submitPostIncident);
 
 //PROFILE
 router.get("/getprofile", authMiddleware, getProfile);

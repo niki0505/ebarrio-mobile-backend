@@ -1,5 +1,27 @@
 import SOS from "../models/SOS.js";
 
+export const submitPostIncident = async (req, res) => {
+  try {
+    const { reportID } = req.params;
+    const { postIncidentForm } = req.body;
+
+    const report = await SOS.findById(reportID);
+
+    report.postreportdetails = postIncidentForm.postreportdetails;
+    report.evidence = postIncidentForm.evidence;
+    report.status = "Resolved";
+
+    await report.save();
+
+    return res
+      .status(200)
+      .json({ message: "Post incident report submitted successfully" });
+  } catch (error) {
+    console.error("Error get pending SOS:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const arrivedSOS = async (req, res) => {
   try {
     const { empID } = req.user;
