@@ -129,15 +129,17 @@ export const verifyOTP = async (req, res) => {
       }
 
       if (!storedOTP) {
-        return res
-          .status(400)
-          .json({ message: "OTP has expired or does not exist" });
+        return res.status(400).json({
+          message: "We couldn’t verify that code. Please check and try again.",
+        });
       }
 
       if (storedOTP === OTP.toString()) {
         return res.status(200).json({ message: "OTP verified successfully!" });
       } else {
-        return res.status(400).json({ message: "Invalid OTP" });
+        return res.status(400).json({
+          message: "We couldn’t verify that code. Please check and try again.",
+        });
       }
     });
   } catch (error) {
@@ -333,7 +335,7 @@ export const checkCredentials = async (req, res) => {
     if (!user || user.status === "Archived") {
       console.log("❌ Account not found");
       return res.status(404).json({
-        message: "Account not found.",
+        message: "Kindly check your details and try again.",
       });
     }
     if (user.status === "Deactivated") {
