@@ -77,6 +77,7 @@ import {
 } from "../controllers/chatController.js";
 import {
   arrivedSOS,
+  didntArriveSOS,
   getActiveSOS,
   getPendingSOS,
   getRespondedSOS,
@@ -197,6 +198,7 @@ router.get("/getactivesos", authMiddleware, getActiveSOS);
 router.get("/getpendingsos", authMiddleware, getPendingSOS);
 router.put("/headingsos/:reportID", authMiddleware, headingSOS);
 router.put("/arrivedsos/:reportID", authMiddleware, arrivedSOS);
+router.put("/didntarrivesos/:reportID", authMiddleware, didntArriveSOS);
 router.put("/postincident/:reportID", authMiddleware, submitPostIncident);
 router.put("/falsealarm/:reportID", authMiddleware, submitFalseAlarm);
 router.get("/getrespondedsos", authMiddleware, getRespondedSOS);

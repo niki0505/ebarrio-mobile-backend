@@ -29,7 +29,7 @@ const sSchema = new mongoose.Schema(
         },
         status: {
           type: String,
-          enum: ["Heading", "Arrived"],
+          enum: ["Heading", "Arrived", "Did Not Arrive"],
           required: true,
         },
         arrivedat: {
