@@ -5,6 +5,13 @@ export const getRespondedSOS = async (req, res) => {
     const { empID } = req.user;
     const reports = await SOS.find({
       "responder.empID": empID,
+    }).populate({
+      path: "resID",
+      select: "firstname lastname age mobilenumber picture householdno",
+      populate: {
+        path: "householdno",
+        select: "address",
+      },
     });
     return res.status(200).json(reports);
   } catch (error) {
