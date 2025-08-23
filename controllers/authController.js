@@ -268,8 +268,34 @@ export const checkResident = async (req, res) => {
     const resident = await Resident.findOne({
       $expr: {
         $and: [
-          { $eq: [{ $toLower: "$firstname" }, firstname.toLowerCase().trim()] },
-          { $eq: [{ $toLower: "$lastname" }, lastname.toLowerCase().trim()] },
+          {
+            $eq: [
+              {
+                $toLower: {
+                  $replaceAll: {
+                    input: "$firstname",
+                    find: " ",
+                    replacement: "",
+                  },
+                },
+              },
+              firstname.toLowerCase().replace(/\s+/g, ""),
+            ],
+          },
+          {
+            $eq: [
+              {
+                $toLower: {
+                  $replaceAll: {
+                    input: "$lastname",
+                    find: " ",
+                    replacement: "",
+                  },
+                },
+              },
+              lastname.toLowerCase().replace(/\s+/g, ""),
+            ],
+          },
           { $eq: ["$mobilenumber", mobilenumber.trim()] },
         ],
       },
