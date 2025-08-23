@@ -76,8 +76,8 @@ export const changeSecurityQuestions = async (req, res) => {
     for (let i = 0; i < 2; i++) {
       if (securityquestions[i]) {
         const isSame = await bcrypt.compare(
-          securityquestions[i],
-          user.securityquestions[i] || ""
+          securityquestions[i].answer,
+          user.securityquestions[i].answer || ""
         );
         if (isSame) {
           return res.status(400).json({
