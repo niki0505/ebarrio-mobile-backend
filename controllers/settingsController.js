@@ -86,7 +86,10 @@ export const changeSecurityQuestions = async (req, res) => {
             } cannot be the same as before.`,
           });
         }
-        user.securityquestions[i] = await bcrypt.hash(securityquestions[i], 10);
+        user.securityquestions[i].answer = await bcrypt.hash(
+          securityquestions[i].answer,
+          10
+        );
       }
     }
     await user.save();
