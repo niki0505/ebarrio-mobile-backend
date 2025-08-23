@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    passwordchangedat: {
+      type: Date,
+      default: null,
+    },
     securityquestions: [
       {
         question: { type: String, required: true },
