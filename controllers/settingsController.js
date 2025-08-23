@@ -92,6 +92,7 @@ export const changeSecurityQuestions = async (req, res) => {
           securityquestions[i].answer,
           10
         );
+        user.securityquestions[i].question = securityquestions[i].question;
       }
     }
     await user.save();
