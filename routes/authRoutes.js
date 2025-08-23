@@ -14,6 +14,7 @@ import {
   deactivatedUser,
   archivedUser,
   updatedUser,
+  changedPasswordUser,
 } from "../controllers/authController.js";
 import {
   getAllUsers,
@@ -102,6 +103,7 @@ router.get("/getuserdetails", authMiddleware, getUserDetails);
 router.post("/deactivateduser", authMiddleware, deactivatedUser);
 router.post("/archiveduser/:userID", authMiddleware, archivedUser);
 router.post("/updateduser", authMiddleware, updatedUser);
+router.post("/changedpassword", authMiddleware, changedPasswordUser);
 
 router.post("/checkrefreshtoken", checkRefreshToken);
 router.get("/refreshtoken", refreshAccessToken);

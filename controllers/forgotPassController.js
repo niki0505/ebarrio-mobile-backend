@@ -39,6 +39,7 @@ export const newPassword = async (req, res) => {
     const user = await User.findOne({ username: username });
 
     user.password = newPassword;
+    user.passwordchangedat = new Date();
     await user.save();
 
     res.status(200).json({ message: "Password successfully changed" });
