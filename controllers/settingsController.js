@@ -63,6 +63,8 @@ export const changeSecurityQuestions = async (req, res) => {
     const { userID } = req.user;
     const { securityquestions, password } = req.body;
 
+    console.log(securityquestions);
+
     const user = await User.findById({ _id: userID });
 
     const isMatch = await bcrypt.compare(password, user.password);
