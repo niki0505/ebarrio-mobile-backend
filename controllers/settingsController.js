@@ -118,6 +118,15 @@ export const changePassword = async (req, res) => {
     const { newpassword, password } = req.body;
     const user = await User.findById({ _id: userID });
 
+    const isSame = await bcrypt.compare(newpassword, user.password);
+
+    if (isSame) {
+      return res.status(400).json({
+        message:
+          "Your new password must be different from your current password.",
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
