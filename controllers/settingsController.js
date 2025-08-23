@@ -73,14 +73,22 @@ export const changeSecurityQuestions = async (req, res) => {
         .json({ message: "Hmm… that password didn’t work. Let’s try again." });
     }
 
-    if (securityquestions[0]) {
-      user.securityquestions[0] = securityquestions[0];
+    for (let i = 0; i < 2; i++) {
+      if (securityquestions[i]) {
+        const isSame = await bcrypt.compare(
+          securityquestions[i],
+          user.securityquestions[i] || ""
+        );
+        if (isSame) {
+          return res.status(400).json({
+            message: `Answer for question ${
+              i + 1
+            } cannot be the same as before.`,
+          });
+        }
+        user.securityquestions[i] = await bcrypt.hash(securityquestions[i], 10);
+      }
     }
-
-    if (securityquestions[1]) {
-      user.securityquestions[1] = securityquestions[1];
-    }
-
     await user.save();
 
     await ActivityLog.insertOne({
