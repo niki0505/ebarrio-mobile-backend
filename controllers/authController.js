@@ -90,7 +90,7 @@ export const deactivatedUser = async (req, res) => {
 
 export const checkUsername = async (req, res) => {
   try {
-    const { userID } = res.user;
+    const { userID } = req.user;
     const { username } = req.params;
 
     const isLimited = await rds.get(`limitUsernameChange_${userID}`);
