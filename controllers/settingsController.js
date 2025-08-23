@@ -2,6 +2,7 @@ import Resident from "../models/Residents.js";
 import User from "../models/Users.js";
 import bcrypt from "bcryptjs";
 import ActivityLog from "../models/ActivityLogs.js";
+import { rds } from "../index.js";
 
 export const checkPassword = async (req, res) => {
   try {
@@ -149,6 +150,8 @@ export const changeUsername = async (req, res) => {
       action: "Account Settings",
       description: `User updated their username.`,
     });
+
+    await rds.setex(`limitUsernameChange_${userID}`, 2592000, "true");
 
     res.status(200).json({ message: "Username changed successfully!" });
   } catch (error) {

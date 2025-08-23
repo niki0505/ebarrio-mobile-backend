@@ -90,12 +90,21 @@ export const deactivatedUser = async (req, res) => {
 
 export const checkUsername = async (req, res) => {
   try {
+    const { userID } = res.user;
     const { username } = req.params;
 
-    const user = await User.findOne({ username });
+    const isLimited = await rds.get(`limitUsernameChange_${userID}`);
 
-    if (user) {
-      return res.status(409).json({ message: "Username is already taken" });
+    if (isLimited) {
+      return res.status(403).json({
+        message: "You can only change your username once every 30 days.",
+      });
+    }
+
+    const usernameTaken = await User.findOne({ username });
+
+    if (usernameTaken) {
+      return res.status(409).json({ message: "Username is already taken." });
     }
     return res.status(200).json({ message: "Username does not exist yet" });
   } catch (error) {
