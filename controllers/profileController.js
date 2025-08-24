@@ -176,8 +176,7 @@ export const updateResident = async (req, res) => {
             const og = await ChangeHousehold.create({
               ...oldHousehold,
             });
-            newhousehold.members[memberIndex].position =
-              resident.householdposition;
+            newhousehold.members[memberIndex].position = householdposition;
 
             newhousehold.status = "Change Requested";
             newhousehold.changeID = og._id;
