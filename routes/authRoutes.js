@@ -208,4 +208,5 @@ router.get("/getrespondedsos", authMiddleware, getRespondedSOS);
 //PROFILE
 router.get("/getprofile", authMiddleware, getProfile);
 router.get("/gethousehold/:householdID", authMiddleware, getHousehold);
+router.put("/updateprofile", authMiddleware, updatedUser);
 export default router;
