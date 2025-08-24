@@ -230,7 +230,9 @@ export const createResident = async (req, res) => {
 
 export const getAllResidents = async (req, res) => {
   try {
-    const residents = await Resident.find()
+    const residents = await Resident.find({
+      status: { $nin: ["Archived", "Rejected"] },
+    })
       .select("-empID")
       .populate("empID")
       .populate("householdno")

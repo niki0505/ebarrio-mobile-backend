@@ -139,7 +139,7 @@ const resSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Active", "Archived", "Pending", "Change Requested"],
+      enum: ["Active", "Archived", "Pending", "Rejected", "Change Requested"],
       required: true,
       default: "Pending",
     },

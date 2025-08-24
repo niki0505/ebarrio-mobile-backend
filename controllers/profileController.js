@@ -153,6 +153,17 @@ export const updateResident = async (req, res) => {
       household.watersource = householdForm.watersource;
       household.toiletfacility = householdForm.toiletfacility;
       household.address = householdForm.address;
+
+      const oldHousehold = household.toObject();
+      const { _id, ...rest } = oldHousehold;
+
+      if (!empID) {
+        const og = await ChangeHousehold.create({
+          ...rest,
+        });
+        household.status = "Change Requested";
+        household.changeID = og._id;
+      }
       await household.save();
     } else {
       const newhousehold = await Household.findById(householdno);
@@ -171,15 +182,16 @@ export const updateResident = async (req, res) => {
 
           if (memberIndex !== -1) {
             const oldHousehold = newhousehold.toObject();
-            delete oldHousehold._id;
+            const { _id, ...rest } = oldHousehold;
 
-            const og = await ChangeHousehold.create({
-              ...oldHousehold,
-            });
             newhousehold.members[memberIndex].position = householdposition;
-
-            newhousehold.status = "Change Requested";
-            newhousehold.changeID = og._id;
+            if (!empID) {
+              const og = await ChangeHousehold.create({
+                ...rest,
+              });
+              newhousehold.status = "Change Requested";
+              newhousehold.changeID = og._id;
+            }
 
             await newhousehold.save();
           }
@@ -202,8 +214,10 @@ export const updateResident = async (req, res) => {
     }
 
     const oldResident = resident.toObject();
+    const { _id, ...rest } = oldResident;
+
     const og = await ChangeResident.create({
-      ...oldResident,
+      ...rest,
     });
     resident.status = "Change Requested";
     resident.changeID = og._id;

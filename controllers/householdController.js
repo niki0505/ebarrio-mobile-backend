@@ -1,7 +1,9 @@
 import Household from "../models/Households.js";
 export const getAllHousehold = async (req, res) => {
   try {
-    const households = await Household.find().populate("members.resID");
+    const households = await Household.find({
+      status: { $nin: ["Archived", "Rejected"] },
+    }).populate("members.resID");
     res.status(200).json(households);
   } catch (error) {
     console.log("Error fetching households", error);
