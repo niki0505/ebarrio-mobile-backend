@@ -153,33 +153,36 @@ export const updateResident = async (req, res) => {
       household.watersource = householdForm.watersource;
       household.toiletfacility = householdForm.toiletfacility;
       household.address = householdForm.address;
+      await household.save();
     } else {
-      const household = await Household.findById(householdno);
+      const newhousehold = await Household.findById(householdno);
 
       const sameHousehold =
-        resident.householdno.toString() === household._id.toString();
+        resident.householdno.toString() === newhousehold._id.toString();
 
       if (sameHousehold) {
-        const currentRecord = household.members.find(
+        const currentRecord = newhousehold.members.find(
           (m) => m.resID.toString() === resident._id.toString()
         );
         if (currentRecord.position !== householdposition) {
-          const memberIndex = household.members.findIndex(
+          const memberIndex = newhousehold.members.findIndex(
             (m) => m.resID.toString() === resident._id.toString()
           );
 
           if (memberIndex !== -1) {
-            const oldHousehold = household.toObject();
+            const oldHousehold = newhousehold.toObject();
             delete oldHousehold._id;
 
             const og = await ChangeHousehold.create({
               ...oldHousehold,
             });
-            household.members[memberIndex].position =
+            newhousehold.members[memberIndex].position =
               resident.householdposition;
 
-            household.status = "Change Requested";
-            household.changeID = og._id;
+            newhousehold.status = "Change Requested";
+            newhousehold.changeID = og._id;
+
+            await newhousehold.save();
           }
         }
       }
@@ -205,7 +208,6 @@ export const updateResident = async (req, res) => {
     });
     resident.status = "Change Requested";
     resident.changeID = og._id;
-    await household.save();
     await resident.save();
 
     res.status(200).json({ message: "Resident successfully updated" });
