@@ -87,7 +87,11 @@ import {
   submitFalseAlarm,
   submitPostIncident,
 } from "../controllers/SOSController.js";
-import { getHousehold, getProfile } from "../controllers/profileController.js";
+import {
+  getHousehold,
+  getProfile,
+  updateResident,
+} from "../controllers/profileController.js";
 
 const router = express.Router();
 
@@ -208,5 +212,5 @@ router.get("/getrespondedsos", authMiddleware, getRespondedSOS);
 //PROFILE
 router.get("/getprofile", authMiddleware, getProfile);
 router.get("/gethousehold/:householdID", authMiddleware, getHousehold);
-router.put("/updateprofile", authMiddleware, updatedUser);
+router.put("/updateprofile", authMiddleware, updateResident);
 export default router;
