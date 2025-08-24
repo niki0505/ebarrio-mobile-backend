@@ -73,25 +73,6 @@ const hSchema = new mongoose.Schema(
   { versionKey: false, timestamps: true }
 );
 
-hSchema.pre("save", async function (next) {
-  if (this.isNew && this.status === "Active" && !this.householdno) {
-    const latest = await this.constructor
-      .findOne({ householdno: { $regex: /^HH-\d{4}$/ } })
-      .sort({ createdAt: -1 });
-
-    let nextNumber = 1;
-
-    if (latest && latest.householdno) {
-      const lastNum = parseInt(latest.householdno.split("-")[1], 10);
-      nextNumber = lastNum + 1;
-    }
-
-    this.householdno = `HH-${String(nextNumber).padStart(4, "0")}`;
-  }
-
-  next();
-});
-
 const ChangeHousehold = mongoose.model("ChangeHousehold", hSchema);
 
 export default ChangeHousehold;
