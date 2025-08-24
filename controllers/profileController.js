@@ -4,6 +4,7 @@ import User from "../models/Users.js";
 import ChangeHousehold from "../models/ChangeHouseholds.js";
 import ChangeResident from "../models/ChangeResident.js";
 import moment from "moment";
+import ActivityLog from "../models/ActivityLogs.js";
 
 export const updateResident = async (req, res) => {
   try {
