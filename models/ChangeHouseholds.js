@@ -8,10 +8,6 @@ const hSchema = new mongoose.Schema(
       unique: true,
       match: /^HH-\d{4}$/,
     },
-    changeID: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ChangeHousehold",
-    },
     members: [
       {
         resID: {
@@ -60,12 +56,6 @@ const hSchema = new mongoose.Schema(
         },
       },
     ],
-    status: {
-      type: String,
-      enum: ["Active", "Archived", "Pending", "Change Requested", "Rejected"],
-      required: true,
-      default: "Active",
-    },
     ethnicity: { type: String, required: true },
     tribe: { type: String },
     sociostatus: { type: String, required: true },
@@ -102,6 +92,6 @@ hSchema.pre("save", async function (next) {
   next();
 });
 
-const Household = mongoose.model("Household", hSchema);
+const ChangeHousehold = mongoose.model("ChangeHousehold", hSchema);
 
-export default Household;
+export default ChangeHousehold;

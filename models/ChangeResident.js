@@ -24,10 +24,6 @@ const resSchema = new mongoose.Schema(
         },
       },
     ],
-    changeID: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ChangeResident",
-    },
     picture: {
       type: String,
       required: true,
@@ -137,12 +133,6 @@ const resSchema = new mongoose.Schema(
     course: {
       type: String,
     },
-    status: {
-      type: String,
-      enum: ["Active", "Archived", "Pending", "Change Requested"],
-      required: true,
-      default: "Pending",
-    },
     isSenior: {
       type: Boolean,
       default: false,
@@ -226,6 +216,6 @@ const resSchema = new mongoose.Schema(
 resSchema.methods.updateAge = function () {
   this.age = moment().diff(moment(this.birthdate), "years");
 };
-const Resident = mongoose.model("Resident", resSchema);
+const ChangeResident = mongoose.model("ChangeResident", resSchema);
 
-export default Resident;
+export default ChangeResident;

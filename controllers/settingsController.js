@@ -63,8 +63,6 @@ export const changeSecurityQuestions = async (req, res) => {
     const { userID } = req.user;
     const { securityquestions, password } = req.body;
 
-    console.log(securityquestions);
-
     const user = await User.findById({ _id: userID });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -118,6 +116,14 @@ export const changePassword = async (req, res) => {
     const { newpassword, password } = req.body;
     const user = await User.findById({ _id: userID });
 
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ message: "Hmm… that password didn’t work. Let’s try again." });
+    }
+
     const isSame = await bcrypt.compare(newpassword, user.password);
 
     if (isSame) {
@@ -125,14 +131,6 @@ export const changePassword = async (req, res) => {
         message:
           "Your new password must be different from your current password.",
       });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res
-        .status(400)
-        .json({ message: "Hmm… that password didn’t work. Let’s try again." });
     }
 
     user.password = newpassword;
