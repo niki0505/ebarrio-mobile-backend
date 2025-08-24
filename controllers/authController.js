@@ -55,7 +55,7 @@ export const archivedUser = async (req, res) => {
 
     const user = await User.findById(userID);
     if (!user) return res.status(404).json({ message: "User not found" });
-
+    user.status = "Archived";
     user.set("pushtoken", undefined);
     await user.save();
 
@@ -74,7 +74,7 @@ export const deactivatedUser = async (req, res) => {
     const { userID } = req.user;
     const user = await User.findById(userID);
     if (!user) return res.status(404).json({ message: "User not found" });
-
+    user.status = "Deactivated";
     user.set("pushtoken", undefined);
     await user.save();
 
