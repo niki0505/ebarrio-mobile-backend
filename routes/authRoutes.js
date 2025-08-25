@@ -209,7 +209,7 @@ router.put("/didntarrivesos/:reportID", authMiddleware, didntArriveSOS);
 router.put("/postincident/:reportID", authMiddleware, submitPostIncident);
 router.put("/falsealarm/:reportID", authMiddleware, submitFalseAlarm);
 router.get("/getrespondedsos", authMiddleware, getRespondedSOS);
-router.get("/cancelsos/:reportID", authMiddleware, cancelSOS);
+router.put("/cancelsos/:reportID", authMiddleware, cancelSOS);
 
 //PROFILE
 router.get("/getprofile", authMiddleware, getProfile);
