@@ -7,6 +7,27 @@ import axios from "axios";
 import Notification from "../models/Notifications.js";
 import mongoose from "mongoose";
 import EmergencyHotline from "../models/EmergencyHotlines.js";
+import SOS from "../models/SOS.js";
+
+export const getActiveSOSUtils = async (resID) => {
+  try {
+    const report = await SOS.find({
+      status: { $in: ["Pending", "Ongoing"] },
+      resID: resID,
+    }).populate({
+      path: "responder.empID",
+      select: "resID position",
+      populate: {
+        path: "resID",
+        select: "firstname lastname mobilenumber picture",
+      },
+    });
+    return report;
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    return 0;
+  }
+};
 
 export const getAllNotificationsUtils = async (userID) => {
   try {

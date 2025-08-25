@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import {
   findUserIDByResID,
+  getActiveSOSUtils,
   getAllNotificationsUtils,
   getAnnouncementsUtils,
   getEmergencyHotlinesUtils,
@@ -251,6 +252,49 @@ export const watchAllCollectionsChanges = (io) => {
   });
 
   notifChangeStream.on("error", (error) => {
+    console.error("Error in change stream:", error);
+  });
+
+  const sosChangeStream = db
+    .collection("sos")
+    .watch([], { fullDocument: "updateLookup" });
+
+  sosChangeStream.on("change", async (change) => {
+    try {
+      console.log("SOS change detected:", change);
+
+      if (
+        change.operationType === "update" ||
+        change.operationType === "insert"
+      ) {
+        const changedDoc = change.fullDocument;
+        if (!changedDoc) {
+          console.warn("No fullDocument found in change event.");
+          return;
+        }
+
+        const userID = await findUserIDByResID(changedDoc.resID);
+        if (!userID) {
+          console.warn(`No userID found for resID: ${changedDoc.resID}`);
+          return;
+        }
+
+        const report = await getActiveSOSUtils(changedDoc.resID);
+
+        const userSocket = connectedUsers.get(String(userID));
+
+        if (userSocket) {
+          io.to(userSocket.socketId).emit("mobile-dbChange", {
+            type: "report",
+            data: report,
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Error handling sos change event:", err);
+    }
+  });
+  sosChangeStream.on("error", (error) => {
     console.error("Error in change stream:", error);
   });
 

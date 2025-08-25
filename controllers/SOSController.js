@@ -1,5 +1,6 @@
 import SOS from "../models/SOS.js";
 import { rds } from "../index.js";
+import { getActiveSOSUtils } from "../utils/collectionUtils.js";
 
 export const cancelSOS = async (req, res) => {
   try {
@@ -220,17 +221,7 @@ export const getPendingSOS = async (req, res) => {
 export const getActiveSOS = async (req, res) => {
   try {
     const { resID } = req.user;
-    const report = await SOS.find({
-      status: { $in: ["Pending", "Ongoing"] },
-      resID: resID,
-    }).populate({
-      path: "responder.empID",
-      select: "resID position",
-      populate: {
-        path: "resID",
-        select: "firstname lastname mobilenumber picture",
-      },
-    });
+    const report = await getActiveSOSUtils(resID);
 
     return res.status(200).json(report);
   } catch (error) {
