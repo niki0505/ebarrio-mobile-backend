@@ -13,8 +13,6 @@ import { connectedUsers } from "../utils/socket.js";
 export const watchAllCollectionsChanges = (io) => {
   const db = mongoose.connection.db;
 
-  const userSocket = connectedUsers.get(userID);
-
   // USERS (ACCOUNTS)
   const usersChangeStream = db.collection("users").watch();
   usersChangeStream.on("change", async (change) => {
@@ -67,6 +65,8 @@ export const watchAllCollectionsChanges = (io) => {
         }
 
         const services = await getServicesUtils(userID);
+
+        const userSocket = connectedUsers.get(userID);
 
         try {
           if (userSocket) {
