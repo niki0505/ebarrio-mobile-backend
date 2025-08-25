@@ -80,7 +80,7 @@ export const watchAllCollectionsChanges = (io) => {
           //   data: services,
           // });
           console.log(
-            `Successfully emitted mobile-dbChange to userID: ${userID}`
+            `Successfully emitted mobile-dbChange to socket Id: ${userSocket.socketId}`
           );
         } catch (err) {
           console.error(`Failed to emit dbChange to userID: ${userID}`, err);
