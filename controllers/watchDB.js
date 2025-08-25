@@ -66,7 +66,7 @@ export const watchAllCollectionsChanges = (io) => {
         const services = await getServicesUtils(userID);
         console.log("Fetched services:", services);
         try {
-          io.emit("mobile-dbChange", {
+          io.to(userID).emit("mobile-dbChange", {
             type: "services",
             data: services,
           });
