@@ -8,10 +8,6 @@ const BlotterCounter = mongoose.model("BlotterCounter", BlotterCounterSchema);
 
 const bSchema = new mongoose.Schema(
   {
-    blotterno: {
-      type: Number,
-      unique: true,
-    },
     complainantID: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Resident",

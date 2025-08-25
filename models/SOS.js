@@ -9,10 +9,6 @@ const SOSCounter = mongoose.model("SOSCounter", SOSCounterSchema);
 
 const sSchema = new mongoose.Schema(
   {
-    SOSno: {
-      type: Number,
-      unique: true,
-    },
     location: {
       lat: { type: Number, required: true },
       lng: { type: Number, required: true },

@@ -12,7 +12,6 @@ const ReservationCounter = mongoose.model(
 
 const crSchema = new mongoose.Schema(
   {
-    reservationno: { type: Number, unique: true, sparse: true },
     resID: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Resident",

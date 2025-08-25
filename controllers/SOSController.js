@@ -1,4 +1,51 @@
 import SOS from "../models/SOS.js";
+import { rds } from "../index.js";
+
+export const cancelSOS = async (req, res) => {
+  try {
+    const { userID, resID } = req.user;
+    const { reportID } = req.params;
+
+    const isLimited = await rds.get(`limitCancellation_${userID}`);
+    if (isLimited) {
+      return res.status(403).json({
+        message: "You have reached the maximum of 3 cancellations for today.",
+      });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const cancelledCount = await SOS.countDocuments({
+      resID,
+      status: "Cancelled",
+      updatedAt: { $gte: today, $lt: tomorrow },
+    });
+
+    if (cancelledCount >= 3) {
+      await rds.setex(`limitCancellation_${userID}`, 86400, "true");
+      return res.status(403).json({
+        message: "You have reached the maximum of 3 cancellations for today.",
+      });
+    }
+
+    const report = await SOS.findById(reportID);
+
+    report.status = "Cancelled";
+
+    await report.save();
+
+    return res
+      .status(200)
+      .json({ message: "SOS report cancelled successfully" });
+  } catch (error) {
+    console.error("Error cancelling report:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export const getRespondedSOS = async (req, res) => {
   try {
