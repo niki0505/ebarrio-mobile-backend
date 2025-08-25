@@ -66,7 +66,7 @@ export const watchAllCollectionsChanges = (io) => {
 
         const services = await getServicesUtils(userID);
 
-        const userSocket = connectedUsers.get(userID);
+        const userSocket = connectedUsers.get(String(userID));
 
         try {
           if (userSocket) {
