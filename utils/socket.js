@@ -28,6 +28,7 @@ export const registerSocketEvents = (io) => {
       // markUserActive(userID);
       socket.join(userID);
       console.log(`Socket joined room: ${userID}`);
+      console.log("All connectedUsers:", connectedUsers);
     });
 
     socket.on("unregister", (userID) => {
