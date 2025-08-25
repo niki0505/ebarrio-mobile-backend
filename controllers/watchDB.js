@@ -68,29 +68,12 @@ export const watchAllCollectionsChanges = (io) => {
 
         const userSocket = connectedUsers.get(String(userID));
 
-        try {
-          if (userSocket) {
-            io.to(userSocket.socketId).emit("mobile-dbChange", {
-              type: "services",
-              data: services,
-            });
-          }
-          // io.to(userID).emit("mobile-dbChange", {
-          //   type: "services",
-          //   data: services,
-          // });
-          console.log(
-            `Successfully emitted mobile-dbChange to socket Id: ${userSocket.socketId}`
-          );
-        } catch (err) {
-          console.error(`Failed to emit dbChange to userID: ${userID}`, err);
+        if (userSocket) {
+          io.to(userSocket.socketId).emit("mobile-dbChange", {
+            type: "services",
+            data: services,
+          });
         }
-      } else if (change.operationType === "delete") {
-        io.emit("mobile-dbChange", {
-          type: "services",
-          deleted: true,
-          id: change.documentKey._id,
-        });
       }
     } catch (err) {
       console.error("Error handling certificates change event:", err);
@@ -122,24 +105,15 @@ export const watchAllCollectionsChanges = (io) => {
         }
 
         const services = await getServicesUtils(userID);
-        console.log("Fetched services:", services);
-        try {
-          io.emit("mobile-dbChange", {
+
+        const userSocket = connectedUsers.get(String(userID));
+
+        if (userSocket) {
+          io.to(userSocket.socketId).emit("mobile-dbChange", {
             type: "services",
             data: services,
           });
-          console.log(
-            `Successfully emitted mobile-dbChange to userID: ${userID}`
-          );
-        } catch (err) {
-          console.error(`Failed to emit dbChange to userID: ${userID}`, err);
         }
-      } else if (change.operationType === "delete") {
-        io.emit("mobile-dbChange", {
-          type: "services",
-          deleted: true,
-          id: change.documentKey._id,
-        });
       }
     } catch (err) {
       console.error("Error handling blotter change event:", err);
@@ -171,24 +145,15 @@ export const watchAllCollectionsChanges = (io) => {
         }
 
         const services = await getServicesUtils(userID);
-        console.log("Fetched services:", services);
-        try {
-          io.emit("mobile-dbChange", {
+
+        const userSocket = connectedUsers.get(String(userID));
+
+        if (userSocket) {
+          io.to(userSocket.socketId).emit("mobile-dbChange", {
             type: "services",
             data: services,
           });
-          console.log(
-            `Successfully emitted mobile-dbChange to userID: ${userID}`
-          );
-        } catch (err) {
-          console.error(`Failed to emit dbChange to userID: ${userID}`, err);
         }
-      } else if (change.operationType === "delete") {
-        io.emit("mobile-dbChange", {
-          type: "services",
-          deleted: true,
-          id: change.documentKey._id,
-        });
       }
     } catch (err) {
       console.error("Error handling court reservations change event:", err);
@@ -266,30 +231,22 @@ export const watchAllCollectionsChanges = (io) => {
       const unreadnotifications = await getUnreadNotifications(
         changedDoc.userID
       );
-      io.emit("mobile-dbChange", {
-        type: "unreadnotifications",
-        data: unreadnotifications,
-      });
+
       const notifications = await getAllNotificationsUtils(changedDoc.userID);
-      io.emit("mobile-dbChange", {
-        type: "notifications",
-        data: notifications,
-      });
-    } else if (change.operationType === "delete") {
-      const unreadnotifications = await getUnreadNotifications(
-        changedDoc.userID
-      );
-      io.emit("mobile-dbChange", {
-        type: "unreadnotifications",
-        data: unreadnotifications,
-      });
-      const notifications = await getAllNotificationsUtils(changedDoc.userID);
-      io.emit("mobile-dbChange", {
-        type: "notifications",
-        data: notifications,
-        deleted: true,
-        id: change.documentKey._id,
-      });
+
+      const userSocket = connectedUsers.get(String(changedDoc.userID));
+
+      if (userSocket) {
+        io.to(userSocket.socketId).emit("mobile-dbChange", {
+          type: "unreadnotifications",
+          data: unreadnotifications,
+        });
+
+        io.to(userSocket.socketId).emit("mobile-dbChange", {
+          type: "notifications",
+          data: notifications,
+        });
+      }
     }
   });
 
