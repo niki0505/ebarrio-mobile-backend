@@ -8,9 +8,12 @@ import {
   getUnreadNotifications,
   getUsersUtils,
 } from "../utils/collectionUtils.js";
+import { connectedUsers } from "../utils/socket.js";
 
 export const watchAllCollectionsChanges = (io) => {
   const db = mongoose.connection.db;
+
+  const userSocket = connectedUsers.get(userID);
 
   // USERS (ACCOUNTS)
   const usersChangeStream = db.collection("users").watch();
@@ -64,12 +67,18 @@ export const watchAllCollectionsChanges = (io) => {
         }
 
         const services = await getServicesUtils(userID);
-        console.log("Fetched services:", services);
+
         try {
-          io.to(userID).emit("mobile-dbChange", {
-            type: "services",
-            data: services,
-          });
+          if (userSocket) {
+            io.to(userSocket.socketId).emit("mobile-dbChange", {
+              type: "services",
+              data: services,
+            });
+          }
+          // io.to(userID).emit("mobile-dbChange", {
+          //   type: "services",
+          //   data: services,
+          // });
           console.log(
             `Successfully emitted mobile-dbChange to userID: ${userID}`
           );
