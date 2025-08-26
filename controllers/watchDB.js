@@ -5,11 +5,13 @@ import {
   getAllNotificationsUtils,
   getAnnouncementsUtils,
   getEmergencyHotlinesUtils,
+  getPendingSOSUtils,
   getServicesUtils,
   getUnreadNotifications,
   getUsersUtils,
 } from "../utils/collectionUtils.js";
 import { connectedUsers } from "../utils/socket.js";
+import SOS from "../models/SOS.js";
 
 export const watchAllCollectionsChanges = (io) => {
   const db = mongoose.connection.db;
@@ -279,7 +281,16 @@ export const watchAllCollectionsChanges = (io) => {
           return;
         }
 
+        const sos = await SOS.findById(changedDoc._id)
+          .populate("responder.empID", "userID")
+          .exec();
+
+        const responderUserIDs = (sos.responder || [])
+          .map((r) => r.empID?.userID)
+          .filter(Boolean);
+
         const report = await getActiveSOSUtils(changedDoc.resID);
+        const pendingReports = await getPendingSOSUtils();
 
         const userSocket = connectedUsers.get(String(userID));
 
@@ -289,6 +300,15 @@ export const watchAllCollectionsChanges = (io) => {
             data: report,
           });
         }
+        responderUserIDs.forEach((userID) => {
+          const userSocket = connectedUsers.get(userID);
+          if (userSocket?.socketId) {
+            io.to(userSocket.socketId).emit("mobile-dbChange", {
+              type: "pendingReports",
+              data: pendingReports,
+            });
+          }
+        });
       }
     } catch (err) {
       console.error("Error handling sos change event:", err);

@@ -9,6 +9,25 @@ import mongoose from "mongoose";
 import EmergencyHotline from "../models/EmergencyHotlines.js";
 import SOS from "../models/SOS.js";
 
+export const getPendingSOSUtils = async (resID) => {
+  try {
+    const reports = await SOS.find({
+      status: { $in: ["Pending", "Ongoing"] },
+    }).populate({
+      path: "resID",
+      select: "firstname lastname age mobilenumber picture householdno",
+      populate: {
+        path: "householdno",
+        select: "address",
+      },
+    });
+    return reports;
+  } catch (error) {
+    console.error("Error fetching SOS:", error);
+    return 0;
+  }
+};
+
 export const getActiveSOSUtils = async (resID) => {
   try {
     const report = await SOS.find({
@@ -24,7 +43,7 @@ export const getActiveSOSUtils = async (resID) => {
     });
     return report;
   } catch (error) {
-    console.error("Error fetching notifications:", error);
+    console.error("Error fetching SOS:", error);
     return 0;
   }
 };
