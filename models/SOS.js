@@ -25,7 +25,7 @@ const sSchema = new mongoose.Schema(
         },
         status: {
           type: String,
-          enum: ["Heading", "Arrived", "Did Not Arrive"],
+          enum: ["Heading", "Arrived"],
           required: true,
         },
         arrivedat: {

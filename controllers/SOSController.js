@@ -84,7 +84,7 @@ export const submitFalseAlarm = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "False alarm report submitted successfully" });
+      .json({ message: "You have marked the report as a false alarm." });
   } catch (error) {
     console.error("Error submitting false alarm report:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -106,7 +106,7 @@ export const submitPostIncident = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "Post incident report submitted successfully" });
+      .json({ message: "The report has been successfully resolved." });
   } catch (error) {
     console.error("Error submitting post incident report:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -126,13 +126,23 @@ export const didntArriveSOS = async (req, res) => {
       return res.status(400).json({ message: "You are not a responder yet" });
     }
 
-    responder.status = "Did Not Arrive";
+    const responderIndex = report.responder.findIndex(
+      (rep) => rep.empID.toString() === empID
+    );
+
+    const currentResponder = report.responder[responderIndex];
+
+    if (currentResponder.isHead && report.responder.length > 1) {
+      report.responder[responderIndex + 1].isHead = true;
+    }
+    report.responder.splice(responderIndex, 1);
 
     await report.save();
 
-    return res
-      .status(200)
-      .json({ message: "You didn't arrive to the SOS report" });
+    return res.status(200).json({
+      message:
+        "You have marked yourself as did not arrive at the report location.",
+    });
   } catch (error) {
     console.error("Error get pending SOS:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -158,7 +168,9 @@ export const arrivedSOS = async (req, res) => {
 
     await report.save();
 
-    return res.status(200).json({ message: "You arrived to the SOS report" });
+    return res.status(200).json({
+      message: "You have marked yourself as arrived at the report location.",
+    });
   } catch (error) {
     console.error("Error get pending SOS:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -190,9 +202,9 @@ export const headingSOS = async (req, res) => {
 
     await report.save();
 
-    return res
-      .status(200)
-      .json({ message: "You are now heading to the SOS report" });
+    return res.status(200).json({
+      message: "You have marked yourself as heading at the report location.",
+    });
   } catch (error) {
     console.error("Error get pending SOS:", error);
     res.status(500).json({ message: "Internal server error" });
