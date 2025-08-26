@@ -53,6 +53,7 @@ export const getRespondedSOS = async (req, res) => {
     const { empID } = req.user;
     const reports = await SOS.find({
       "responder.empID": empID,
+      status: { $in: ["Resolved", "False Alarm"] },
     }).populate({
       path: "resID",
       select: "firstname lastname age mobilenumber picture householdno",
