@@ -301,7 +301,7 @@ export const watchAllCollectionsChanges = (io) => {
           });
         }
         responderUserIDs.forEach((userID) => {
-          const userSocket = connectedUsers.get(userID);
+          const userSocket = connectedUsers.get(String(userID));
           if (userSocket?.socketId) {
             io.to(userSocket.socketId).emit("mobile-dbChange", {
               type: "pendingReports",
