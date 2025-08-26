@@ -17,6 +17,7 @@ export const changedPasswordUser = async (req, res) => {
 
     const user = await User.findById(userID);
     user.status = "Inactive";
+    user.set("pushtoken", undefined);
     await user.save();
     res.status(200).json({
       message:
