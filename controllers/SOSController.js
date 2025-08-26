@@ -135,6 +135,10 @@ export const didntArriveSOS = async (req, res) => {
     if (currentResponder.isHead && report.responder.length > 1) {
       report.responder[responderIndex + 1].isHead = true;
     }
+
+    if (report.responder.length === 1) {
+      report.status = "Pending";
+    }
     report.responder.splice(responderIndex, 1);
 
     await report.save();
