@@ -32,13 +32,6 @@ export const createResident = async (req, res) => {
       emergencyname,
       emergencymobilenumber,
       emergencyaddress,
-      address,
-      mother,
-      father,
-      spouse,
-      siblings,
-      children,
-      HOAname,
       employmentstatus,
       occupation,
       monthlyincome,
@@ -46,7 +39,6 @@ export const createResident = async (req, res) => {
       typeofschool,
       course,
       head,
-      // is4Ps,
       isPregnant,
       isSenior,
       isInfant,
@@ -58,9 +50,7 @@ export const createResident = async (req, res) => {
       isAdult,
       isPostpartum,
       isWomenOfReproductive,
-      // isChild,
       isPWD,
-      // isSoloParent,
       householdForm,
       householdno,
       householdposition,
@@ -79,26 +69,6 @@ export const createResident = async (req, res) => {
 
     const birthDate = moment(birthdate, "YYYY/MM/DD");
     const age = moment().diff(birthDate, "years");
-
-    const motherAsObjectId = mother
-      ? new mongoose.Types.ObjectId(mother)
-      : null;
-    const fatherAsObjectId = father
-      ? new mongoose.Types.ObjectId(father)
-      : null;
-    const spouseAsObjectId = spouse
-      ? new mongoose.Types.ObjectId(spouse)
-      : null;
-
-    const siblingsAsObjectIds =
-      siblings && siblings.length > 0
-        ? siblings.map((siblingId) => new mongoose.Types.ObjectId(siblingId))
-        : [];
-
-    const childrenAsObjectIds =
-      children && children.length > 0
-        ? children.map((childrenId) => new mongoose.Types.ObjectId(childrenId))
-        : [];
 
     const resident = new Resident({
       picture,
@@ -128,20 +98,12 @@ export const createResident = async (req, res) => {
       emergencyname,
       emergencymobilenumber,
       emergencyaddress,
-      address,
-      mother: motherAsObjectId,
-      father: fatherAsObjectId,
-      spouse: spouseAsObjectId,
-      siblings: siblingsAsObjectIds,
-      children: childrenAsObjectIds,
-      HOAname,
       employmentstatus,
       occupation,
       monthlyincome,
       educationalattainment,
       typeofschool,
       course,
-      // is4Ps,
       isPregnant,
       isSenior,
       isInfant,
@@ -153,9 +115,7 @@ export const createResident = async (req, res) => {
       isAdult,
       isPostpartum,
       isWomenOfReproductive,
-      // isChild,
       isPWD,
-      // isSoloParent,
       philhealthid,
       philhealthtype,
       philhealthcategory,
@@ -169,7 +129,7 @@ export const createResident = async (req, res) => {
       fpstatus,
     });
     await resident.save();
-    console.log(householdForm);
+
     let members = [...householdForm.members];
 
     if (head === "Yes") {
@@ -182,6 +142,7 @@ export const createResident = async (req, res) => {
         ...householdForm,
         members,
       });
+      household.status = "Pending";
       await household.save();
 
       await Resident.findByIdAndUpdate(resident._id, {

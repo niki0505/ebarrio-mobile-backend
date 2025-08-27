@@ -304,7 +304,7 @@ export const checkResident = async (req, res) => {
     });
 
     if (!resident) {
-      return res.status(404).json({ message: "Resident not found" });
+      return res.status(404).json({ message: "Resident not found." });
     }
 
     if (resident.status === "Pending") {
@@ -316,7 +316,7 @@ export const checkResident = async (req, res) => {
     if (resident.userID) {
       return res
         .status(409)
-        .json({ message: "Resident already has an account" });
+        .json({ message: "Resident already has an account." });
     }
 
     const user = await User.findOne({ username });
