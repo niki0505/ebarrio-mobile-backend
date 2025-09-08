@@ -50,8 +50,9 @@ export const unheartAnnouncement = async (req, res) => {
     sendNotificationUpdate(user._id.toString(), io);
 
     await ActivityLog.insertOne({
-      userID: userID,
-      action: "Announcements",
+      userID,
+      action: "Unlike",
+      target: "Announcements",
       description: `User unliked ${announcement.title} post`,
     });
 
@@ -113,8 +114,9 @@ export const heartAnnouncement = async (req, res) => {
     sendNotificationUpdate(user._id.toString(), io);
 
     await ActivityLog.insertOne({
-      userID: userID,
-      action: "Announcements",
+      userID,
+      action: "Like",
+      target: "Announcements",
       description: `User liked ${announcement.title} post`,
     });
 

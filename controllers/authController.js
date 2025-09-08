@@ -369,8 +369,9 @@ export const logoutUser = async (req, res) => {
     user.save();
 
     await ActivityLog.insertOne({
-      userID: userID,
+      userID,
       action: "Logout",
+      target: "User Accounts",
       description: "User logged out successfully.",
     });
 
@@ -439,14 +440,16 @@ export const checkCredentials = async (req, res) => {
 
         await ActivityLog.insertOne({
           userID: user._id,
-          action: "Login",
+          action: "Failed Login",
+          target: "User Accounts",
           description: "The login attempt failed due to an incorrect password.",
         });
 
         if (attempts > 5) {
           await ActivityLog.insertOne({
             userID: user._id,
-            action: "Login",
+            action: "Failed Login",
+            target: "User Accounts",
             description:
               "User was locked out due to many failed login attempts.",
           });
@@ -538,6 +541,7 @@ export const loginUser = async (req, res) => {
     await ActivityLog.insertOne({
       userID: user._id,
       action: "Login",
+      target: "User Accounts",
       description: "User logged in successfully.",
     });
 

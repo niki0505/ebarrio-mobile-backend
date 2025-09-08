@@ -4,11 +4,13 @@ import CourtReservation from "../models/CourtReservations.js";
 import mongoose from "mongoose";
 import Notification from "../models/Notifications.js";
 import { sendNotificationUpdate } from "../utils/collectionUtils.js";
+import ActivityLog from "../models/ActivityLogs.js";
 
 export const cancelReservationReq = async (req, res) => {
   try {
     const { reservationID } = req.params;
     const { reservationReason } = req.body;
+    const { userID } = req.user;
 
     const reservation = await CourtReservation.findById(reservationID);
 
@@ -55,6 +57,13 @@ export const cancelReservationReq = async (req, res) => {
       sendNotificationUpdate(notif.userID.toString(), io);
     });
 
+    await ActivityLog.insertOne({
+      userID,
+      action: "Cancel",
+      target: "Court Reservations",
+      description: `User cancelled their court reservation.`,
+    });
+
     return res
       .status(200)
       .json({ message: "Reservation cancelled successfully!" });
@@ -76,6 +85,7 @@ export const getReservations = async (req, res) => {
 
 export const sendReservationReq = async (req, res) => {
   try {
+    const { userID } = req.user;
     const { reservationForm } = req.body;
     const reservation = new CourtReservation({
       ...reservationForm,
@@ -112,6 +122,13 @@ export const sendReservationReq = async (req, res) => {
 
     notifications.forEach((notif) => {
       sendNotificationUpdate(notif.userID.toString(), io);
+    });
+
+    await ActivityLog.insertOne({
+      userID,
+      action: "Create",
+      target: "Court Reservations",
+      description: `User requested court reservation.`,
     });
 
     return res

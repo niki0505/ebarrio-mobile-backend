@@ -47,8 +47,9 @@ export const sendBlotter = async (req, res) => {
     });
 
     await ActivityLog.insertOne({
-      userID: userID,
-      action: "Blotter Report",
+      userID,
+      action: "Create",
+      target: "Blotter Reports",
       description: `User submitted a blotter report.`,
     });
     return res.status(200).json({ message: "Blotter submitted successfully!" });

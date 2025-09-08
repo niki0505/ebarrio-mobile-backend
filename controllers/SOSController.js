@@ -4,6 +4,7 @@ import {
   getActiveSOSUtils,
   getPendingSOSUtils,
 } from "../utils/collectionUtils.js";
+import ActivityLog from "../models/ActivityLogs.js";
 
 export const cancelSOS = async (req, res) => {
   try {
@@ -42,6 +43,13 @@ export const cancelSOS = async (req, res) => {
 
     await report.save();
 
+    await ActivityLog.insertOne({
+      userID,
+      action: "Cancel",
+      target: "SOS",
+      description: `User cancelled their SOS report.`,
+    });
+
     return res
       .status(200)
       .json({ message: "SOS report cancelled successfully" });
@@ -74,16 +82,27 @@ export const getRespondedSOS = async (req, res) => {
 
 export const submitFalseAlarm = async (req, res) => {
   try {
+    const { userID } = req.user;
     const { reportID } = req.params;
     const { falseAlarmForm } = req.body;
 
-    const report = await SOS.findById(reportID);
+    const report = await SOS.findById(reportID).populate({
+      path: "resID",
+      select: "lastname firstname",
+    });
 
     report.postreportdetails = falseAlarmForm.postreportdetails;
     report.evidence = falseAlarmForm.evidence;
     report.status = "False Alarm";
 
     await report.save();
+
+    await ActivityLog.insertOne({
+      userID,
+      action: "Update",
+      target: "SOS",
+      description: `User submitted a false alarm report for ${report.resID.lastname}, ${report.resID.firstname}'s SOS report.`,
+    });
 
     return res
       .status(200)
@@ -96,16 +115,27 @@ export const submitFalseAlarm = async (req, res) => {
 
 export const submitPostIncident = async (req, res) => {
   try {
+    const { userID } = req.user;
     const { reportID } = req.params;
     const { postIncidentForm } = req.body;
 
-    const report = await SOS.findById(reportID);
+    const report = await SOS.findById(reportID).populate({
+      path: "resID",
+      select: "lastname firstname",
+    });
 
     report.postreportdetails = postIncidentForm.postreportdetails;
     report.evidence = postIncidentForm.evidence;
     report.status = "Resolved";
 
     await report.save();
+
+    await ActivityLog.insertOne({
+      userID,
+      action: "Update",
+      target: "SOS",
+      description: `User submitted a post-incident report for ${report.resID.lastname}, ${report.resID.firstname}'s SOS report.`,
+    });
 
     return res
       .status(200)
@@ -117,9 +147,12 @@ export const submitPostIncident = async (req, res) => {
 };
 export const didntArriveSOS = async (req, res) => {
   try {
-    const { empID } = req.user;
+    const { empID, userID } = req.user;
     const { reportID } = req.params;
-    const report = await SOS.findById(reportID);
+    const report = await SOS.findById(reportID).populate({
+      path: "resID",
+      select: "lastname firstname",
+    });
 
     const responder = report.responder.find(
       (rep) => rep.empID.toString() === empID
@@ -146,6 +179,13 @@ export const didntArriveSOS = async (req, res) => {
 
     await report.save();
 
+    await ActivityLog.insertOne({
+      userID,
+      action: "Update",
+      target: "SOS",
+      description: `User marked themselves as didn't arrive to ${report.resID.lastname}, ${report.resID.firstname}'s SOS report location.`,
+    });
+
     return res.status(200).json({
       message:
         "You have marked yourself as did not arrive at the report location.",
@@ -158,9 +198,12 @@ export const didntArriveSOS = async (req, res) => {
 
 export const arrivedSOS = async (req, res) => {
   try {
-    const { empID } = req.user;
+    const { empID, userID } = req.user;
     const { reportID } = req.params;
-    const report = await SOS.findById(reportID);
+    const report = await SOS.findById(reportID).populate({
+      path: "resID",
+      select: "lastname firstname",
+    });
 
     const responder = report.responder.find(
       (rep) => rep.empID.toString() === empID
@@ -175,6 +218,13 @@ export const arrivedSOS = async (req, res) => {
 
     await report.save();
 
+    await ActivityLog.insertOne({
+      userID,
+      action: "Update",
+      target: "SOS",
+      description: `User marked themselves as arrived to ${report.resID.lastname}, ${report.resID.firstname}'s SOS report location.`,
+    });
+
     return res.status(200).json({
       message: "You have marked yourself as arrived at the report location.",
     });
@@ -186,9 +236,12 @@ export const arrivedSOS = async (req, res) => {
 
 export const headingSOS = async (req, res) => {
   try {
-    const { empID } = req.user;
+    const { empID, userID } = req.user;
     const { reportID } = req.params;
-    const report = await SOS.findById(reportID);
+    const report = await SOS.findById(reportID).populate({
+      path: "resID",
+      select: "lastname firstname",
+    });
     const alreadyResponder = report.responder.some(
       (r) => r.empID.toString() === empID
     );
@@ -208,6 +261,13 @@ export const headingSOS = async (req, res) => {
     report.status = "Ongoing";
 
     await report.save();
+
+    await ActivityLog.insertOne({
+      userID,
+      action: "Update",
+      target: "SOS",
+      description: `User marked themselves as heading to ${report.resID.lastname}, ${report.resID.firstname}'s SOS report location.`,
+    });
 
     return res.status(200).json({
       message: "You have marked yourself as heading at the report location.",
@@ -243,7 +303,7 @@ export const getActiveSOS = async (req, res) => {
 
 export const sendSOS = async (req, res) => {
   try {
-    const { resID } = req.user;
+    const { resID, userID } = req.user;
     const { location } = req.body;
 
     const report = new SOS({
@@ -252,6 +312,13 @@ export const sendSOS = async (req, res) => {
     });
 
     await report.save();
+
+    await ActivityLog.insertOne({
+      userID,
+      action: "Create",
+      target: "SOS",
+      description: `User sent an SOS report.`,
+    });
 
     return res.status(200).json({ message: "SOS has been sent successfully." });
   } catch (error) {

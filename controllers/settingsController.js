@@ -46,8 +46,9 @@ export const changeMobileNumber = async (req, res) => {
     await resident.save();
 
     await ActivityLog.insertOne({
-      userID: userID,
-      action: "Account Settings",
+      userID,
+      action: "Update",
+      target: "Mobile Number",
       description: `User updated their mobile number.`,
     });
 
@@ -101,8 +102,9 @@ export const changeSecurityQuestions = async (req, res) => {
     await user.save();
 
     await ActivityLog.insertOne({
-      userID: userID,
-      action: "Account Settings",
+      userID,
+      action: "Update",
+      target: "Security Questions",
       description: `User updated their security questions.`,
     });
 
@@ -143,8 +145,9 @@ export const changePassword = async (req, res) => {
     await user.save();
 
     await ActivityLog.insertOne({
-      userID: userID,
-      action: "Account Settings",
+      userID,
+      action: "Update",
+      target: "Password",
       description: `User updated their password.`,
     });
 
@@ -172,8 +175,9 @@ export const changeUsername = async (req, res) => {
     user.username = username;
     await user.save();
     await ActivityLog.insertOne({
-      userID: userID,
-      action: "Account Settings",
+      userID,
+      action: "Update",
+      target: "Username",
       description: `User updated their username.`,
     });
 

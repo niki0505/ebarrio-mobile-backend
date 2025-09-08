@@ -117,7 +117,7 @@ router.post("/logout", authMiddleware, logoutUser);
 //FORGOT PASSWORD
 router.get("/checkuser/:username", checkUser);
 router.post("/verifyquestion/:username", verifySecurityQuestion);
-router.post("/newpassword/:username", newPassword);
+router.post("/newpassword/:username", authMiddleware, newPassword);
 router.get("/limitotp/:username", limitOTP);
 router.get("/checkotp/:username", checkOTP);
 

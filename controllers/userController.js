@@ -5,13 +5,14 @@ import { getUsersUtils } from "../utils/collectionUtils.js";
 
 export const logActivity = async (req, res) => {
   try {
-    const { action, description } = req.body;
+    const { action, target, description } = req.body;
     const { userID } = req.user;
 
     await ActivityLog.insertOne({
-      userID: userID,
-      action: action,
-      description: description,
+      userID,
+      action,
+      target,
+      description,
     });
 
     return res
@@ -72,6 +73,13 @@ export const resetPassword = async (req, res) => {
       } else {
         console.log(`Deleted ${response} key from Redis`);
       }
+    });
+
+    await ActivityLog.insertOne({
+      userID: user._id,
+      action: "Password Set",
+      target: "User Accounts",
+      description: `User set their password successfully.`,
     });
 
     return res

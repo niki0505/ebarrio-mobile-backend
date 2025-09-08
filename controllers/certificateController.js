@@ -61,9 +61,10 @@ export const cancelCertReq = async (req, res) => {
     });
 
     await ActivityLog.insertOne({
-      userID: userID,
-      action: "Document Request",
-      description: `User cancelled their ${cert.typeofcertificate.toLowerCase()} request`,
+      userID,
+      action: "Cancel",
+      target: "Document Requests",
+      description: `User cancelled their ${cert.typeofcertificate.toLowerCase()} request.`,
     });
     return res
       .status(200)
@@ -129,9 +130,10 @@ export const sendCertReq = async (req, res) => {
     });
 
     await ActivityLog.insertOne({
-      userID: userID,
-      action: "Document Request",
-      description: `User requested ${certificate.typeofcertificate.toLowerCase()}`,
+      userID,
+      action: "Create",
+      target: "Document Requests",
+      description: `User requested ${certificate.typeofcertificate.toLowerCase()}.`,
     });
 
     return res

@@ -1,5 +1,6 @@
 import { bucket } from "../firebaseAdmin.js";
 import { rds } from "../index.js";
+import ActivityLog from "../models/ActivityLogs.js";
 import Resident from "../models/Residents.js";
 import axios from "axios";
 
@@ -37,6 +38,13 @@ export async function alertResidents(req, res) {
     await Promise.all(smsPromises);
 
     await rds.setex(`limitAlert`, 600, "true");
+
+    await ActivityLog.insertOne({
+      userID,
+      action: "Notify",
+      target: "River Snapshots",
+      description: `User alerted residents about the water level.`,
+    });
 
     return res.status(200).json({
       message: "Residents have been successfully alerted.",
