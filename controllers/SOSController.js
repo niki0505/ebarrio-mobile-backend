@@ -3,8 +3,11 @@ import { rds } from "../index.js";
 import {
   getActiveSOSUtils,
   getPendingSOSUtils,
+  sendPushNotification,
 } from "../utils/collectionUtils.js";
 import ActivityLog from "../models/ActivityLogs.js";
+import User from "../models/Users.js";
+import Notification from "../models/Notifications.js";
 
 export const cancelSOS = async (req, res) => {
   try {
@@ -311,7 +314,17 @@ export const sendSOS = async (req, res) => {
       resID,
     });
 
+    const users = await User.find({
+      status: { $in: ["Active", "Inactive"] },
+      role: { $nin: ["Resident", "Technical Admin"] },
+    });
+
     await report.save();
+
+    const populatedReport = await report.populate({
+      path: "resID",
+      select: "firstname lastname",
+    });
 
     await ActivityLog.insertOne({
       userID,
@@ -319,6 +332,41 @@ export const sendSOS = async (req, res) => {
       target: "SOS",
       description: `User sent an SOS report.`,
     });
+
+    const io = req.app.get("socketio");
+
+    io.emit("sos", {
+      title: `🆘 Emergency Alert`,
+      message: `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
+      timestamp: report.createdAt,
+    });
+
+    for (const user of users) {
+      if (user?.pushtoken) {
+        try {
+          await sendPushNotification(
+            user.pushtoken,
+            `🆘 Emergency Alert`,
+            `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
+            "SOSRequests"
+          );
+          await Notification.insertOne({
+            userID: user._id,
+            title: `🆘 Emergency Alert`,
+            message: `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
+            redirectTo: "SOSRequests",
+          });
+          console.log(`✅ Notification sent to ${user.username}`);
+        } catch (err) {
+          console.error(
+            `❌ Failed to send notification to ${user.username}:`,
+            err
+          );
+        }
+      } else {
+        console.log("⚠️ No push token found for user:", user.username);
+      }
+    }
 
     return res.status(200).json({ message: "SOS has been sent successfully." });
   } catch (error) {
