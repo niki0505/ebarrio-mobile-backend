@@ -257,7 +257,11 @@ export const submitPostIncident = async (req, res) => {
       sendNotificationUpdate(user._id.toString(), io);
     }
 
+    console.log("Responders", report.responder);
     for (const user of report.responder) {
+      if (user.empID.userID === userID) {
+        return;
+      }
       io.to(user.empID.userID.toString()).emit("sos", {
         title: `🆘 Emergency Update`,
         message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
