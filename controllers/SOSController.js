@@ -4,6 +4,7 @@ import {
   getActiveSOSUtils,
   getPendingSOSUtils,
   sendPushNotification,
+  sendNotificationUpdate,
 } from "../utils/collectionUtils.js";
 import ActivityLog from "../models/ActivityLogs.js";
 import User from "../models/Users.js";
