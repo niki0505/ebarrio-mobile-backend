@@ -85,6 +85,7 @@ import {
   getRespondedSOS,
   headingSOS,
   sendSOS,
+  sendSOSWithDetails,
   submitFalseAlarm,
   submitPostIncident,
 } from "../controllers/SOSController.js";
@@ -201,6 +202,7 @@ router.get("/getchat", authMiddleware, getChatHistory);
 
 //SOS
 router.post("/sendsos", authMiddleware, sendSOS);
+router.post("/sendsoswithdetails", authMiddleware, sendSOSWithDetails);
 router.get("/getactivesos", authMiddleware, getActiveSOS);
 router.get("/getpendingsos", authMiddleware, getPendingSOS);
 router.put("/headingsos/:reportID", authMiddleware, headingSOS);

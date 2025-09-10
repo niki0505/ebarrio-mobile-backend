@@ -573,6 +573,81 @@ export const getActiveSOS = async (req, res) => {
   }
 };
 
+export const sendSOSWithDetails = async (req, res) => {
+  try {
+    const { resID, userID } = req.user;
+    const { location, reportdetails, reporttype } = req.body;
+
+    const report = new SOS({
+      location,
+      resID,
+      reportdetails,
+      reporttype,
+    });
+
+    const users = await User.find({
+      status: { $in: ["Active", "Inactive"] },
+      role: { $nin: ["Resident", "Technical Admin"] },
+    });
+
+    await report.save();
+
+    const populatedReport = await report.populate({
+      path: "resID",
+      select: "firstname lastname",
+    });
+
+    await ActivityLog.insertOne({
+      userID,
+      action: "Create",
+      target: "SOS",
+      description: `User sent an SOS report.`,
+    });
+
+    const io = req.app.get("socketio");
+
+    io.to("sos").emit("sos", {
+      title: `🆘 Emergency Alert`,
+      message: `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
+      timestamp: report.createdAt,
+    });
+
+    for (const user of users) {
+      if (user?.pushtoken) {
+        try {
+          await sendPushNotification(
+            user.pushtoken,
+            `🆘 Emergency Alert`,
+            `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
+            "SOSRequests"
+          );
+
+          console.log(`✅ Notification sent to ${user.username}`);
+        } catch (err) {
+          console.error(
+            `❌ Failed to send notification to ${user.username}:`,
+            err
+          );
+        }
+      } else {
+        console.log("⚠️ No push token found for user:", user.username);
+      }
+      await Notification.create({
+        userID: user._id,
+        title: `🆘 Emergency Alert`,
+        message: `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
+        redirectTo: "SOSRequests",
+      });
+      sendNotificationUpdate(user._id.toString(), io);
+    }
+
+    return res.status(200).json({ message: "SOS has been sent successfully." });
+  } catch (error) {
+    console.error("Error sending SOS:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const sendSOS = async (req, res) => {
   try {
     const { resID, userID } = req.user;
