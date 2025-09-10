@@ -136,16 +136,62 @@ export const submitFalseAlarm = async (req, res) => {
     const { reportID } = req.params;
     const { falseAlarmForm } = req.body;
 
-    const report = await SOS.findById(reportID).populate({
+    const report = await SOS.findById(reportID)
+      .populate({
+        path: "resID",
+        select: "lastname firstname",
+      })
+      .populate({
+        path: "responder",
+        populate: { path: "empID", select: "userID" },
+      });
+
+    const employee = await Employee.findById(empID).populate({
       path: "resID",
       select: "lastname firstname",
     });
 
+    const webAdmins = await User.find({
+      role: { $in: ["Secretary", "Clerk", "Justice"] },
+    });
     report.postreportdetails = falseAlarmForm.postreportdetails;
     report.evidence = falseAlarmForm.evidence;
     report.status = "False Alarm";
 
     await report.save();
+
+    const io = req.app.get("socketio");
+
+    for (const user of webAdmins) {
+      io.to(user._id.toString()).emit("sos", {
+        title: `🆘 Emergency Update`,
+        message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a false alarm report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
+        timestamp: report.updatedAt,
+      });
+      await Notification.create({
+        userID: user._id,
+        title: `🆘 Emergency Update`,
+        message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a false alarm report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
+        redirectTo: "/sos-update-reports",
+      });
+      sendNotificationUpdate(user._id.toString(), io);
+    }
+
+    for (const user of report.responder) {
+      io.to(user.empID.userID.toString()).emit("sos", {
+        title: `🆘 Emergency Update`,
+        message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a false alarm report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
+        timestamp: report.updatedAt,
+        redirectTo: "RespondedSOS",
+      });
+      await Notification.create({
+        userID: user.empID.userID,
+        title: `🆘 Emergency Update`,
+        message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a false alarm report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
+        redirectTo: "RespondedSOS",
+      });
+      sendNotificationUpdate(user.empID.userID.toString(), io);
+    }
 
     await ActivityLog.insertOne({
       userID,
@@ -211,7 +257,7 @@ export const submitPostIncident = async (req, res) => {
       sendNotificationUpdate(user._id.toString(), io);
     }
 
-    for (const user of report.responders) {
+    for (const user of report.responder) {
       io.to(user.empID.userID.toString()).emit("sos", {
         title: `🆘 Emergency Update`,
         message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
