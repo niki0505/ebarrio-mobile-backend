@@ -64,7 +64,7 @@ export const cancelSOS = async (req, res) => {
 
     const io = req.app.get("socketio");
 
-    io.emit("sos", {
+    io.to("sos").emit("sos", {
       title: `❌ Emergency Cancelled`,
       message: `${report.resID.firstname} ${report.resID.lastname} has cancelled their emergency report.`,
       timestamp: report.createdAt,
@@ -381,7 +381,7 @@ export const sendSOS = async (req, res) => {
 
     const io = req.app.get("socketio");
 
-    io.emit("sos", {
+    io.to("sos").emit("sos", {
       title: `🆘 Emergency Alert`,
       message: `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
       timestamp: report.createdAt,
