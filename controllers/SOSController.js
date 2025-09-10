@@ -264,33 +264,31 @@ export const submitPostIncident = async (req, res) => {
     }
 
     for (const user of report.responder) {
-      if (user.empID.userID._id === userID) {
-        continue;
+      if (user.empID.userID._id !== userID) {
+        if (user.empID.userID.pushtoken) {
+          await sendPushNotification(
+            user.empID.userID.pushtoken,
+            `🆘 Emergency Report Update`,
+            `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
+            "RespondedSOS"
+          );
+        } else {
+          console.log("⚠️ No push token found for user:", user.username);
+        }
+        io.to(user.empID.userID._id.toString()).emit("sos", {
+          title: `🆘 Emergency Update`,
+          message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
+          timestamp: report.updatedAt,
+          redirectTo: "RespondedSOS",
+        });
+        await Notification.create({
+          userID: user.empID.userID._id,
+          title: `🆘 Emergency Update`,
+          message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
+          redirectTo: "RespondedSOS",
+        });
+        sendNotificationUpdate(user.empID.userID._id.toString(), io);
       }
-
-      if (user.empID.userID.pushtoken) {
-        await sendPushNotification(
-          user.pushtoken,
-          `🆘 Emergency Report Update`,
-          `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
-          "RespondedSOS"
-        );
-      } else {
-        console.log("⚠️ No push token found for user:", user.username);
-      }
-      io.to(user.empID.userID._id.toString()).emit("sos", {
-        title: `🆘 Emergency Update`,
-        message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
-        timestamp: report.updatedAt,
-        redirectTo: "RespondedSOS",
-      });
-      await Notification.create({
-        userID: user.empID.userID._id,
-        title: `🆘 Emergency Update`,
-        message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
-        redirectTo: "RespondedSOS",
-      });
-      sendNotificationUpdate(user.empID.userID._id.toString(), io);
     }
 
     await ActivityLog.insertOne({
