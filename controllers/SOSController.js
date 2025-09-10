@@ -173,6 +173,7 @@ export const submitFalseAlarm = async (req, res) => {
         title: `🆘 Emergency Update`,
         message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a false alarm report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
         timestamp: report.updatedAt,
+        redirectTo: "RespondedSOS",
       });
       await Notification.create({
         userID: user._id,
@@ -270,6 +271,7 @@ export const submitPostIncident = async (req, res) => {
         title: `🆘 Emergency Update`,
         message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
         timestamp: report.updatedAt,
+        redirectTo: "RespondedSOS",
       });
       await Notification.create({
         userID: user._id,
