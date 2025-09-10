@@ -79,13 +79,6 @@ export const cancelSOS = async (req, res) => {
             `${report.resID.firstname} ${report.resID.lastname} has cancelled their emergency report.`,
             "SOSRequests"
           );
-          await Notification.create({
-            userID: user._id,
-            title: `❌ Emergency Cancelled`,
-            message: `${report.resID.firstname} ${report.resID.lastname} has cancelled their emergency report.`,
-            redirectTo: "SOSRequests",
-          });
-          sendNotificationUpdate(user._id.toString(), io);
 
           console.log(`✅ Notification sent to ${user.username}`);
         } catch (err) {
@@ -97,6 +90,13 @@ export const cancelSOS = async (req, res) => {
       } else {
         console.log("⚠️ No push token found for user:", user.username);
       }
+      await Notification.create({
+        userID: user._id,
+        title: `❌ Emergency Cancelled`,
+        message: `${report.resID.firstname} ${report.resID.lastname} has cancelled their emergency report.`,
+        redirectTo: "SOSRequests",
+      });
+      sendNotificationUpdate(user._id.toString(), io);
     }
 
     return res
@@ -396,13 +396,6 @@ export const sendSOS = async (req, res) => {
             `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
             "SOSRequests"
           );
-          await Notification.create({
-            userID: user._id,
-            title: `🆘 Emergency Alert`,
-            message: `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
-            redirectTo: "SOSRequests",
-          });
-          sendNotificationUpdate(user._id.toString(), io);
 
           console.log(`✅ Notification sent to ${user.username}`);
         } catch (err) {
@@ -414,6 +407,13 @@ export const sendSOS = async (req, res) => {
       } else {
         console.log("⚠️ No push token found for user:", user.username);
       }
+      await Notification.create({
+        userID: user._id,
+        title: `🆘 Emergency Alert`,
+        message: `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
+        redirectTo: "SOSRequests",
+      });
+      sendNotificationUpdate(user._id.toString(), io);
     }
 
     return res.status(200).json({ message: "SOS has been sent successfully." });
