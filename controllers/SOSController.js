@@ -21,6 +21,11 @@ export const cancelSOS = async (req, res) => {
       });
     }
 
+    const users = await User.find({
+      status: { $in: ["Active", "Inactive"] },
+      role: { $nin: ["Resident", "Technical Admin"] },
+    });
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -40,7 +45,10 @@ export const cancelSOS = async (req, res) => {
       });
     }
 
-    const report = await SOS.findById(reportID);
+    const report = await SOS.findById(reportID).populate({
+      path: "resID",
+      select: "firstname lastname",
+    });
 
     report.status = "Cancelled";
 
@@ -52,6 +60,43 @@ export const cancelSOS = async (req, res) => {
       target: "SOS",
       description: `User cancelled their SOS report.`,
     });
+
+    const io = req.app.get("socketio");
+
+    io.emit("sos", {
+      title: `❌ Emergency Cancelled`,
+      message: `${report.resID.firstname} ${report.resID.lastname} has cancelled their emergency report.`,
+      timestamp: report.createdAt,
+    });
+
+    for (const user of users) {
+      if (user?.pushtoken) {
+        try {
+          await sendPushNotification(
+            user.pushtoken,
+            `❌ Emergency Cancelled`,
+            `${report.resID.firstname} ${report.resID.lastname} has cancelled their emergency report.`,
+            "SOSRequests"
+          );
+          await Notification.create({
+            userID: user._id,
+            title: `❌ Emergency Cancelled`,
+            message: `${report.resID.firstname} ${report.resID.lastname} has cancelled their emergency report.`,
+            redirectTo: "SOSRequests",
+          });
+          sendNotificationUpdate(user._id.toString(), io);
+
+          console.log(`✅ Notification sent to ${user.username}`);
+        } catch (err) {
+          console.error(
+            `❌ Failed to send notification to ${user.username}:`,
+            err
+          );
+        }
+      } else {
+        console.log("⚠️ No push token found for user:", user.username);
+      }
+    }
 
     return res
       .status(200)
@@ -350,12 +395,14 @@ export const sendSOS = async (req, res) => {
             `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
             "SOSRequests"
           );
-          await Notification.insertOne({
+          await Notification.create({
             userID: user._id,
             title: `🆘 Emergency Alert`,
             message: `${populatedReport.resID.firstname} ${populatedReport.resID.lastname} needs help!`,
             redirectTo: "SOSRequests",
           });
+          sendNotificationUpdate(user._id.toString(), io);
+
           console.log(`✅ Notification sent to ${user.username}`);
         } catch (err) {
           console.error(

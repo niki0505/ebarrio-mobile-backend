@@ -35,7 +35,7 @@ export const sendBlotter = async (req, res) => {
 
     const notifications = allUsers.map((user) => ({
       userID: user._id,
-      title: "Blotter Report",
+      title: "📄 Blotter Report",
       message: `${resident.firstname} ${resident.lastname} filed a blotter.`,
       redirectTo: "/blotter-reports",
     }));
