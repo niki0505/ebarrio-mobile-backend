@@ -165,13 +165,27 @@ export const submitFalseAlarm = async (req, res) => {
 
 export const submitPostIncident = async (req, res) => {
   try {
-    const { userID } = req.user;
+    const { userID, empID } = req.user;
     const { reportID } = req.params;
     const { postIncidentForm } = req.body;
 
-    const report = await SOS.findById(reportID).populate({
+    const report = await SOS.findById(reportID)
+      .populate({
+        path: "resID",
+        select: "lastname firstname",
+      })
+      .populate({
+        path: "responder",
+        populate: { path: "empID", select: "userID" },
+      });
+
+    const employee = await Employee.findById(empID).populate({
       path: "resID",
       select: "lastname firstname",
+    });
+
+    const webAdmins = await User.find({
+      role: { $in: ["Secretary", "Clerk", "Justice"] },
     });
 
     report.postreportdetails = postIncidentForm.postreportdetails;
@@ -179,6 +193,39 @@ export const submitPostIncident = async (req, res) => {
     report.status = "Resolved";
 
     await report.save();
+
+    const io = req.app.get("socketio");
+
+    for (const user of webAdmins) {
+      io.to(user._id.toString()).emit("sos", {
+        title: `🆘 Emergency Update`,
+        message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
+        timestamp: report.updatedAt,
+      });
+      await Notification.create({
+        userID: user._id,
+        title: `🆘 Emergency Update`,
+        message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
+        redirectTo: "/sos-update-reports",
+      });
+      sendNotificationUpdate(user._id.toString(), io);
+    }
+
+    for (const user of report.responders) {
+      io.to(user.empID.userID.toString()).emit("sos", {
+        title: `🆘 Emergency Update`,
+        message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
+        timestamp: report.updatedAt,
+        redirectTo: "RespondedSOS",
+      });
+      await Notification.create({
+        userID: user.empID.userID,
+        title: `🆘 Emergency Update`,
+        message: `${employee.resID.firstname} ${employee.resID.lastname} has submitted a post-incident report regarding ${report.resID.firstname} ${report.resID.lastname}'s emergency.`,
+        redirectTo: "RespondedSOS",
+      });
+      sendNotificationUpdate(user.empID.userID.toString(), io);
+    }
 
     await ActivityLog.insertOne({
       userID,
@@ -202,6 +249,12 @@ export const didntArriveSOS = async (req, res) => {
     const report = await SOS.findById(reportID).populate({
       path: "resID",
       select: "lastname firstname",
+    });
+
+    const user = await User.findOne({ resID: report.resID });
+    const employee = await Employee.findById(empID).populate({
+      path: "resID",
+      select: "firstname lastname",
     });
 
     const responder = report.responder.find(
@@ -229,6 +282,31 @@ export const didntArriveSOS = async (req, res) => {
 
     await report.save();
 
+    const io = req.app.get("socketio");
+    io.to(user._id.toString()).emit("sosUpdate", {
+      title: `🆘 Emergency Report Update`,
+      message: `${employee.resID.firstname} ${employee.resID.lastname} didn't arrive to your location.`,
+      timestamp: report.updatedAt,
+    });
+
+    if (user?.pushtoken) {
+      await sendPushNotification(
+        user.pushtoken,
+        `🆘 Emergency Report Update`,
+        `${employee.resID.firstname} ${employee.resID.lastname} didn't arrive to your location.`,
+        "SOSStatusPage"
+      );
+    } else {
+      console.log("⚠️ No push token found for user:", user.username);
+    }
+
+    await Notification.insertOne({
+      userID: user._id,
+      title: `🆘 Emergency Report Update`,
+      message: `${employee.resID.firstname} ${employee.resID.lastname} didn't arrive to your location.`,
+      redirectTo: "SOSStatusPage",
+    });
+
     await ActivityLog.insertOne({
       userID,
       action: "Update",
@@ -255,6 +333,12 @@ export const arrivedSOS = async (req, res) => {
       select: "lastname firstname",
     });
 
+    const user = await User.findOne({ resID: report.resID });
+    const employee = await Employee.findById(empID).populate({
+      path: "resID",
+      select: "firstname lastname",
+    });
+
     const responder = report.responder.find(
       (rep) => rep.empID.toString() === empID
     );
@@ -267,6 +351,31 @@ export const arrivedSOS = async (req, res) => {
     responder.arrivedat = new Date();
 
     await report.save();
+
+    const io = req.app.get("socketio");
+    io.to(user._id.toString()).emit("sosUpdate", {
+      title: `🆘 Emergency Report Update`,
+      message: `${employee.resID.firstname} ${employee.resID.lastname} has arrived to your location.`,
+      timestamp: report.updatedAt,
+    });
+
+    if (user?.pushtoken) {
+      await sendPushNotification(
+        user.pushtoken,
+        `🆘 Emergency Report Update`,
+        `${employee.resID.firstname} ${employee.resID.lastname} has arrived to your location.`,
+        "SOSStatusPage"
+      );
+    } else {
+      console.log("⚠️ No push token found for user:", user.username);
+    }
+
+    await Notification.insertOne({
+      userID: user._id,
+      title: `🆘 Emergency Report Update`,
+      message: `${employee.resID.firstname} ${employee.resID.lastname} has arrived to your location.`,
+      redirectTo: "SOSStatusPage",
+    });
 
     await ActivityLog.insertOne({
       userID,
@@ -320,7 +429,7 @@ export const headingSOS = async (req, res) => {
     const io = req.app.get("socketio");
     io.to(user._id.toString()).emit("sosUpdate", {
       title: `🆘 Emergency Report Update`,
-      message: `${employee.resID.firstname} ${employee.resID.lastname} is on the way`,
+      message: `${employee.resID.firstname} ${employee.resID.lastname} is on the way.`,
       timestamp: report.updatedAt,
     });
 
@@ -328,7 +437,7 @@ export const headingSOS = async (req, res) => {
       await sendPushNotification(
         user.pushtoken,
         `🆘 Emergency Report Update`,
-        `${employee.resID.firstname} ${employee.resID.lastname} is on the way`,
+        `${employee.resID.firstname} ${employee.resID.lastname} is on the way.`,
         "SOSStatusPage"
       );
     } else {
@@ -338,7 +447,7 @@ export const headingSOS = async (req, res) => {
     await Notification.insertOne({
       userID: user._id,
       title: `🆘 Emergency Report Update`,
-      message: `${employee.resID.firstname} ${employee.resID.lastname} is on the way`,
+      message: `${employee.resID.firstname} ${employee.resID.lastname} is on the way.`,
       redirectTo: "SOSStatusPage",
     });
 
