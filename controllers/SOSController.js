@@ -9,6 +9,7 @@ import {
 import ActivityLog from "../models/ActivityLogs.js";
 import User from "../models/Users.js";
 import Notification from "../models/Notifications.js";
+import Employee from "../models/Employees.js";
 
 export const cancelSOS = async (req, res) => {
   try {
@@ -291,6 +292,11 @@ export const headingSOS = async (req, res) => {
       path: "resID",
       select: "lastname firstname",
     });
+    const user = await User.findOne({ resID: report.resID });
+    const employee = await Employee.findById(empID).populate({
+      path: "resID",
+      select: "firstname lastname",
+    });
     const alreadyResponder = report.responder.some(
       (r) => r.empID.toString() === empID
     );
@@ -310,6 +316,31 @@ export const headingSOS = async (req, res) => {
     report.status = "Ongoing";
 
     await report.save();
+
+    const io = req.app.get("socketio");
+    io.to(user._id.toString()).emit("sosUpdate", {
+      title: `🆘 Emergency Report Update`,
+      message: `${employee.resID.firstname} ${employee.resID.lastname} is on the way`,
+      timestamp: report.updatedAt,
+    });
+
+    if (user?.pushtoken) {
+      await sendPushNotification(
+        user.pushtoken,
+        `🆘 Emergency Report Update`,
+        `${employee.resID.firstname} ${employee.resID.lastname} is on the way`,
+        "SOSStatusPage"
+      );
+    } else {
+      console.log("⚠️ No push token found for user:", user.username);
+    }
+
+    await Notification.insertOne({
+      userID: user._id,
+      title: `🆘 Emergency Report Update`,
+      message: `${employee.resID.firstname} ${employee.resID.lastname} is on the way`,
+      redirectTo: "SOSStatusPage",
+    });
 
     await ActivityLog.insertOne({
       userID,
