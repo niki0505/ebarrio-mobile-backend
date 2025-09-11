@@ -275,10 +275,12 @@ export const updateResident = async (req, res) => {
               // No eligible members → archive household
               household.status = "Archived";
             }
+            resident.householdno = newHouse._id;
             newHouse.members.push({
               resID: resident._id,
               position: householdposition,
             });
+            await newHouse.save();
           } else if (
             householdno &&
             householdno.toString() === resident.householdno.toString()
