@@ -147,33 +147,13 @@ export const createResident = async (req, res) => {
       await Resident.findByIdAndUpdate(resident._id, {
         householdno: household._id,
       });
-
-      // await Promise.all(
-      //   members.map(({ resID }) =>
-      //     Resident.findByIdAndUpdate(resID, { householdno: household._id })
-      //   )
-      // );
     } else if (head === "No") {
       if (householdno && householdposition) {
         const household = await Household.findById(householdno);
         if (household) {
           resident.set("householdno", householdno);
-
-          const alreadyMember = household.members.some(
-            (m) => m.resID.toString() === resident._id.toString()
-          );
-
-          if (!alreadyMember) {
-            household.members.push({
-              resID: resident._id,
-              position: householdposition,
-            });
-          }
-
-          household.status = "Change Requested";
-
+          resident.set("householdposition", householdposition);
           await resident.save();
-          await household.save();
         }
       }
     }
