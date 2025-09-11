@@ -435,79 +435,106 @@ export const updateResident = async (req, res) => {
             let members = [...householdForm.members];
             // Resident becomes head in new household
             if (head === "Yes") {
-              members.push({
-                resID: resident._id,
-                position: "Head",
-              });
-              const newhousehold = new Household({
-                ...householdForm,
-                members,
-              });
-              newhousehold.status = "Pending";
-              await newhousehold.save();
-              const updated = await ChangeResident.create({
-                picture,
-                signature,
-                firstname,
-                middlename,
-                lastname,
-                suffix,
-                alias,
-                salutation,
-                sex,
-                gender,
-                birthdate,
-                age,
-                birthplace,
-                civilstatus,
-                bloodtype,
-                religion,
-                nationality,
-                voter,
-                precinct,
-                deceased,
-                email,
-                mobilenumber,
-                telephone,
-                facebook,
-                emergencyname,
-                emergencymobilenumber,
-                emergencyaddress,
-                HOAname,
-                employmentstatus,
-                occupation,
-                monthlyincome,
-                educationalattainment,
-                typeofschool,
-                course,
-                isSenior,
-                isInfant,
-                isNewborn,
-                isUnder5,
-                isSchoolAge,
-                isAdolescent,
-                isAdolescentPregnant,
-                isAdult,
-                isPostpartum,
-                isWomenOfReproductive,
-                isPWD,
-                isPregnant,
-                philhealthid,
-                philhealthtype,
-                philhealthcategory,
-                haveHypertension,
-                haveDiabetes,
-                haveTubercolosis,
-                haveSurgery,
-                lastmenstrual,
-                haveFPmethod,
-                fpmethod,
-                fpstatus,
-                householdno: newhousehold._id,
-                head,
-              });
-              resident.changeID = updated._id;
-              resident.status = "Change Requested";
+              if (!empID) {
+                members.push({
+                  resID: resident._id,
+                  position: "Head",
+                });
+                const newhousehold = new Household({
+                  ...householdForm,
+                  members,
+                });
+                newhousehold.status = "Pending";
+                await newhousehold.save();
+                const updated = await ChangeResident.create({
+                  picture,
+                  signature,
+                  firstname,
+                  middlename,
+                  lastname,
+                  suffix,
+                  alias,
+                  salutation,
+                  sex,
+                  gender,
+                  birthdate,
+                  age,
+                  birthplace,
+                  civilstatus,
+                  bloodtype,
+                  religion,
+                  nationality,
+                  voter,
+                  precinct,
+                  deceased,
+                  email,
+                  mobilenumber,
+                  telephone,
+                  facebook,
+                  emergencyname,
+                  emergencymobilenumber,
+                  emergencyaddress,
+                  HOAname,
+                  employmentstatus,
+                  occupation,
+                  monthlyincome,
+                  educationalattainment,
+                  typeofschool,
+                  course,
+                  isSenior,
+                  isInfant,
+                  isNewborn,
+                  isUnder5,
+                  isSchoolAge,
+                  isAdolescent,
+                  isAdolescentPregnant,
+                  isAdult,
+                  isPostpartum,
+                  isWomenOfReproductive,
+                  isPWD,
+                  isPregnant,
+                  philhealthid,
+                  philhealthtype,
+                  philhealthcategory,
+                  haveHypertension,
+                  haveDiabetes,
+                  haveTubercolosis,
+                  haveSurgery,
+                  lastmenstrual,
+                  haveFPmethod,
+                  fpmethod,
+                  fpstatus,
+                  householdno: newhousehold._id,
+                  head,
+                });
+                resident.changeID = updated._id;
+                resident.status = "Change Requested";
+              } else {
+                members.push({
+                  resID: resident._id,
+                  position: "Head",
+                });
+                const newhousehold = new Household({
+                  ...householdForm,
+                  members,
+                });
+                newhousehold.status = "Active";
+                await newhousehold.save();
+
+                if (resident.householdno) {
+                  const oldHousehold = await Household.findById(
+                    resident.householdno
+                  );
+                  if (oldHousehold) {
+                    oldHousehold.members = oldHousehold.members.filter(
+                      (m) => m.resID.toString() !== resident._id.toString()
+                    );
+                    await oldHousehold.save();
+                  }
+                }
+                resident.householdno = newhousehold._id;
+                await resident.save();
+              }
             } else {
               // Resident stays in the SAME household → only position changes
               if (!empID) {
