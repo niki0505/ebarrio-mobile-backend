@@ -244,9 +244,7 @@ export const updateResident = async (req, res) => {
             householdno &&
             householdno.toString() !== resident.householdno.toString()
           ) {
-            const newHouse = await Household.findById(
-              householdForm.householdno
-            );
+            const newHouse = await Household.findById(householdno);
             const otherActiveMembers = household.members.filter(
               (mem) => mem.resID.toString() !== resident._id.toString()
             );
