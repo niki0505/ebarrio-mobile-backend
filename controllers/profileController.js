@@ -328,8 +328,19 @@ export const updateResident = async (req, res) => {
               resident.householdposition = householdposition;
             }
           } else {
-            // Resident stays in the SAME household → only position changes
-            if (!empID) {
+            let members = [...householdForm.members];
+            // Resident becomes head in new household
+            if (head === "Yes") {
+              members.push({
+                resID: resident._id,
+                position: "Head",
+              });
+              const newhousehold = new Household({
+                ...householdForm,
+                members,
+              });
+              newhousehold.status = "Pending";
+              await newhousehold.save();
               const updated = await ChangeResident.create({
                 picture,
                 signature,
@@ -388,15 +399,83 @@ export const updateResident = async (req, res) => {
                 haveFPmethod,
                 fpmethod,
                 fpstatus,
-                householdno,
+                householdno: newhousehold._id,
                 householdposition,
                 head,
               });
               resident.changeID = updated._id;
               resident.status = "Change Requested";
             } else {
-              // Employee override (directly update position)
-              resident.householdposition = householdposition;
+              // Resident stays in the SAME household → only position changes
+              if (!empID) {
+                const updated = await ChangeResident.create({
+                  picture,
+                  signature,
+                  firstname,
+                  middlename,
+                  lastname,
+                  suffix,
+                  alias,
+                  salutation,
+                  sex,
+                  gender,
+                  birthdate,
+                  age,
+                  birthplace,
+                  civilstatus,
+                  bloodtype,
+                  religion,
+                  nationality,
+                  voter,
+                  precinct,
+                  deceased,
+                  email,
+                  mobilenumber,
+                  telephone,
+                  facebook,
+                  emergencyname,
+                  emergencymobilenumber,
+                  emergencyaddress,
+                  HOAname,
+                  employmentstatus,
+                  occupation,
+                  monthlyincome,
+                  educationalattainment,
+                  typeofschool,
+                  course,
+                  isSenior,
+                  isInfant,
+                  isNewborn,
+                  isUnder5,
+                  isSchoolAge,
+                  isAdolescent,
+                  isAdolescentPregnant,
+                  isAdult,
+                  isPostpartum,
+                  isWomenOfReproductive,
+                  isPWD,
+                  isPregnant,
+                  philhealthid,
+                  philhealthtype,
+                  philhealthcategory,
+                  haveHypertension,
+                  haveDiabetes,
+                  haveTubercolosis,
+                  haveSurgery,
+                  lastmenstrual,
+                  haveFPmethod,
+                  fpmethod,
+                  fpstatus,
+                  householdno,
+                  householdposition,
+                  head,
+                });
+                resident.changeID = updated._id;
+                resident.status = "Change Requested";
+              } else {
+                // Employee override (directly update position)
+                resident.householdposition = householdposition;
+              }
             }
           }
         }
