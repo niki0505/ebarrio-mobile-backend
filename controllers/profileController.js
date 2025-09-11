@@ -277,7 +277,7 @@ export const updateResident = async (req, res) => {
             }
             newHouse.members.push({
               resID: resident._id,
-              position: updated.householdposition,
+              position: householdposition,
             });
           } else if (
             householdno &&
