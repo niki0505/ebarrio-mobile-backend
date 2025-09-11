@@ -68,6 +68,7 @@ export const updateResident = async (req, res) => {
       fpstatus,
       householdno,
       householdposition,
+      head,
       householdForm,
     } = req.body;
 
@@ -152,6 +153,7 @@ export const updateResident = async (req, res) => {
         const headMember = household.members.find((m) => m.position === "Head");
 
         if (!empID) {
+          // Head staying, update household info
           const updated = await ChangeHousehold.create({
             members: [headMember, ...householdForm.members],
             vehicles: householdForm.vehicles,
@@ -165,8 +167,8 @@ export const updateResident = async (req, res) => {
           });
           household.status = "Change Requested";
           household.change.push({ changeID: updated._id });
-          // If an employee changes the household (No approval needed)
         } else {
+          // If an employee changes the household (No approval needed)
           household.members = householdForm.members;
           household.vehicles = householdForm.vehicles;
           household.ethnicity = householdForm.ethnicity;
@@ -178,41 +180,76 @@ export const updateResident = async (req, res) => {
           household.address = householdForm.address;
         }
         await household.save();
+      } else {
+        if (!empID) {
+          const updated = await ChangeResident.create({
+            picture,
+            signature,
+            firstname,
+            middlename,
+            lastname,
+            suffix,
+            alias,
+            salutation,
+            sex,
+            gender,
+            birthdate,
+            age,
+            birthplace,
+            civilstatus,
+            bloodtype,
+            religion,
+            nationality,
+            voter,
+            precinct,
+            deceased,
+            email,
+            mobilenumber,
+            telephone,
+            facebook,
+            emergencyname,
+            emergencymobilenumber,
+            emergencyaddress,
+            HOAname,
+            employmentstatus,
+            occupation,
+            monthlyincome,
+            educationalattainment,
+            typeofschool,
+            course,
+            isSenior,
+            isInfant,
+            isNewborn,
+            isUnder5,
+            isSchoolAge,
+            isAdolescent,
+            isAdolescentPregnant,
+            isAdult,
+            isPostpartum,
+            isWomenOfReproductive,
+            isPWD,
+            isPregnant,
+            philhealthid,
+            philhealthtype,
+            philhealthcategory,
+            haveHypertension,
+            haveDiabetes,
+            haveTubercolosis,
+            haveSurgery,
+            lastmenstrual,
+            haveFPmethod,
+            fpmethod,
+            fpstatus,
+            householdno,
+            householdposition,
+          });
+          resident.changeID = updated._id;
+          resident.status = "Change Requested";
+        }
       }
-      // } else {
-      //   const newhousehold = await Household.findById(householdno);
-
-      //   const sameHousehold =
-      //     resident.householdno.toString() === newhousehold._id.toString();
-
-      //   if (sameHousehold) {
-      //     const currentRecord = newhousehold.members.find(
-      //       (m) => m.resID.toString() === resident._id.toString()
-      //     );
-      //     if (currentRecord.position !== householdposition) {
-      //       const memberIndex = newhousehold.members.findIndex(
-      //         (m) => m.resID.toString() === resident._id.toString()
-      //       );
-
-      //       if (memberIndex !== -1) {
-      //         const oldHousehold = newhousehold.toObject();
-      //         const { _id, ...rest } = oldHousehold;
-
-      //         newhousehold.members[memberIndex].position = householdposition;
-      //         if (!empID) {
-      //           const og = await ChangeHousehold.create({
-      //             ...rest,
-      //           });
-      //           newhousehold.status = "Change Requested";
-      //           newhousehold.changeID = og._id;
-      //         }
-
-      //         await newhousehold.save();
-      //       }
-      //     }
-      //   }
-      // }
     }
+
+    await resident.save();
 
     if (empID) {
       await ActivityLog.insertOne({
@@ -229,16 +266,6 @@ export const updateResident = async (req, res) => {
         description: `User requested a change to their resident profile.`,
       });
     }
-
-    // const oldResident = resident.toObject();
-    // const { _id, ...rest } = oldResident;
-
-    // const og = await ChangeResident.create({
-    //   ...rest,
-    // });
-    // resident.status = "Change Requested";
-    // resident.changeID = og._id;
-    // await resident.save();
 
     res.status(200).json({ message: "Resident successfully updated" });
   } catch (error) {
