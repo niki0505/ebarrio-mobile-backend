@@ -400,7 +400,6 @@ export const updateResident = async (req, res) => {
                 fpmethod,
                 fpstatus,
                 householdno: newhousehold._id,
-                householdposition,
                 head,
               });
               resident.changeID = updated._id;

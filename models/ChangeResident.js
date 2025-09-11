@@ -208,6 +208,7 @@ const resSchema = new mongoose.Schema(
     fpstatus: { type: String },
     householdno: { type: mongoose.Schema.Types.ObjectId, ref: "Household" },
     householdposition: { type: String },
+    head: { type: String },
     userID: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     empID: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
   },
