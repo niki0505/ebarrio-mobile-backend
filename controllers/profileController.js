@@ -284,7 +284,11 @@ export const updateResident = async (req, res) => {
             }
 
             // Update household fields no matter what
-            household.members = householdForm.members;
+
+            const headMember = household.members.find(
+              (m) => m.position === "Head"
+            );
+            household.members = [headMember, ...householdForm.members];
             household.vehicles = householdForm.vehicles;
             household.ethnicity = householdForm.ethnicity;
             household.tribe = householdForm.tribe;
