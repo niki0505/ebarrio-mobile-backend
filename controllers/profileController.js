@@ -249,9 +249,11 @@ export const updateResident = async (req, res) => {
             householdno.toString() === resident.householdno.toString()
           ) {
             // Employee override
-            const oldMemberIds = household.members.map((m) =>
-              m.resID._id ? m.resID._id.toString() : m.resID.toString()
-            );
+            const oldMemberIds = household.members
+              .filter((m) => m.position !== "Head")
+              .map((m) =>
+                m.resID._id ? m.resID._id.toString() : m.resID.toString()
+              );
             const newMemberIds = householdForm.members.map((m) =>
               m.resID._id ? m.resID._id.toString() : m.resID.toString()
             );
