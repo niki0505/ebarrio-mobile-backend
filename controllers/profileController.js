@@ -240,16 +240,53 @@ export const updateResident = async (req, res) => {
             household.change.push({ changeID: updated._id });
           }
         } else {
-          // Employee override
-          household.members = householdForm.members;
-          household.vehicles = householdForm.vehicles;
-          household.ethnicity = householdForm.ethnicity;
-          household.tribe = householdForm.tribe;
-          household.sociostatus = householdForm.sociostatus;
-          household.nhtsno = householdForm.nhtsno;
-          household.watersource = householdForm.watersource;
-          household.toiletfacility = householdForm.toiletfacility;
-          household.address = householdForm.address;
+          if (
+            householdno &&
+            householdno.toString() !== resident.householdno.toString()
+          ) {
+          } else if (
+            householdno &&
+            householdno.toString() === resident.householdno.toString()
+          ) {
+            // Employee override
+            const oldMemberIds = household.members.map((m) =>
+              m.resID._id ? m.resID._id.toString() : m.resID.toString()
+            );
+            const newMemberIds = householdForm.members.map((m) =>
+              m.resID._id ? m.resID._id.toString() : m.resID.toString()
+            );
+
+            // 1️⃣ Remove householdno for residents no longer in the household
+            for (const oldId of oldMemberIds) {
+              if (!newMemberIds.includes(oldId)) {
+                const resident = await Resident.findById(oldId);
+                if (resident) {
+                  resident.householdno = null;
+                  await resident.save();
+                }
+              }
+            }
+
+            // 2️⃣ Assign householdno to new members
+            for (const newId of newMemberIds) {
+              if (!oldMemberIds.includes(newId)) {
+                const resident = await Resident.findById(newId);
+                if (resident) {
+                  resident.householdno = household._id;
+                  await resident.save();
+                }
+              }
+            }
+            household.members = householdForm.members;
+            household.vehicles = householdForm.vehicles;
+            household.ethnicity = householdForm.ethnicity;
+            household.tribe = householdForm.tribe;
+            household.sociostatus = householdForm.sociostatus;
+            household.nhtsno = householdForm.nhtsno;
+            household.watersource = householdForm.watersource;
+            household.toiletfacility = householdForm.toiletfacility;
+            household.address = householdForm.address;
+          }
         }
 
         await household.save();
