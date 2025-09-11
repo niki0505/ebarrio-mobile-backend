@@ -526,19 +526,46 @@ export const updateResident = async (req, res) => {
                     resident.householdno
                   );
                   if (oldHousehold) {
-                    // Collect IDs of all members moving to new household
+                    // IDs of all members moving to new household
                     const movingMemberIds = members.map((m) =>
                       m.resID.toString()
+                    );
+
+                    // Check if any moved member was Head
+                    const headsMoving = oldHousehold.members.filter(
+                      (m) =>
+                        movingMemberIds.includes(m.resID.toString()) &&
+                        m.position === "Head"
                     );
 
                     // Remove them from old household
                     oldHousehold.members = oldHousehold.members.filter(
                       (m) => !movingMemberIds.includes(m.resID.toString())
                     );
+
+                    // If any of the moved members was Head, assign a new Head
+                    if (headsMoving.length && oldHousehold.members.length) {
+                      // Pick oldest remaining member as new Head
+                      const newHead = oldHousehold.members.reduce(
+                        (prev, curr) =>
+                          curr.resID.age > prev.resID.age ? curr : prev
+                      );
+                      oldHousehold.members = oldHousehold.members.map((m) =>
+                        m.resID.toString() === newHead.resID.toString()
+                          ? { ...m, position: "Head" }
+                          : m
+                      );
+                    }
+
+                    // Archive old household if empty
+                    if (!oldHousehold.members.length)
+                      oldHousehold.status = "Archived";
+
                     await oldHousehold.save();
                   }
                 }
 
+                // Update householdno for all moved members
                 for (const m of members) {
                   const movedResident = await Resident.findById(m.resID);
                   if (movedResident) {
@@ -546,6 +573,7 @@ export const updateResident = async (req, res) => {
                     await movedResident.save();
                   }
                 }
+
                 resident.householdno = newhousehold._id;
                 await resident.save();
               }
