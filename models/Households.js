@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import moment from "moment";
-
 const hSchema = new mongoose.Schema(
   {
     householdno: {
@@ -9,10 +7,14 @@ const hSchema = new mongoose.Schema(
       match: /^HH-\d{4}$/,
       sparse: true,
     },
-    changeID: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ChangeHousehold",
-    },
+    change: [
+      {
+        changeID: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "ChangeHousehold",
+        },
+      },
+    ],
     members: [
       {
         resID: {

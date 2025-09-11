@@ -76,14 +76,6 @@ export const updateResident = async (req, res) => {
 
     const resident = await Resident.findById(resID);
 
-    const household = await Household.findById(resident.householdno);
-
-    const isHead = household?.members?.some(
-      (member) =>
-        member.resID.toString() === resident._id.toString() &&
-        member.position === "Head"
-    );
-
     resident.picture = picture;
     resident.signature = signature;
     resident.firstname = firstname;
@@ -143,60 +135,81 @@ export const updateResident = async (req, res) => {
     resident.fpstatus = fpstatus;
     resident.householdno = householdno;
 
-    if (isHead) {
-      household.members = householdForm.members;
-      household.vehicles = householdForm.vehicles;
-      household.ethnicity = householdForm.ethnicity;
-      household.tribe = householdForm.tribe;
-      household.sociostatus = householdForm.sociostatus;
-      household.nhtsno = householdForm.nhtsno;
-      household.watersource = householdForm.watersource;
-      household.toiletfacility = householdForm.toiletfacility;
-      household.address = householdForm.address;
+    const household = await Household.findById(resident.householdno);
 
-      const oldHousehold = household.toObject();
-      const { _id, ...rest } = oldHousehold;
+    // If the resident has chosen household
+    if (household) {
+      const isHead = household?.members?.some(
+        (member) =>
+          member.resID.toString() === resident._id.toString() &&
+          member.position === "Head"
+      );
 
-      if (!empID) {
-        const og = await ChangeHousehold.create({
-          ...rest,
-        });
-        household.status = "Change Requested";
-        household.changeID = og._id;
-      }
-      await household.save();
-    } else {
-      const newhousehold = await Household.findById(householdno);
-
-      const sameHousehold =
-        resident.householdno.toString() === newhousehold._id.toString();
-
-      if (sameHousehold) {
-        const currentRecord = newhousehold.members.find(
-          (m) => m.resID.toString() === resident._id.toString()
-        );
-        if (currentRecord.position !== householdposition) {
-          const memberIndex = newhousehold.members.findIndex(
-            (m) => m.resID.toString() === resident._id.toString()
-          );
-
-          if (memberIndex !== -1) {
-            const oldHousehold = newhousehold.toObject();
-            const { _id, ...rest } = oldHousehold;
-
-            newhousehold.members[memberIndex].position = householdposition;
-            if (!empID) {
-              const og = await ChangeHousehold.create({
-                ...rest,
-              });
-              newhousehold.status = "Change Requested";
-              newhousehold.changeID = og._id;
-            }
-
-            await newhousehold.save();
-          }
+      // If the resident is Head
+      if (isHead) {
+        // Saves the new household to ChangeHousehold
+        // If resident changes the household (Subject for approval)
+        if (!empID) {
+          const updated = await ChangeHousehold.create({
+            members: householdForm.members,
+            vehicles: householdForm.vehicles,
+            ethnicity: householdForm.ethnicity,
+            tribe: householdForm.tribe,
+            sociostatus: householdForm.sociostatus,
+            nhtsno: householdForm.nhtsno,
+            watersource: householdForm.watersource,
+            toiletfacility: householdForm.toiletfacility,
+            address: householdForm.address,
+          });
+          household.status = "Change Requested";
+          household.change.push({ changeID: updated._id });
+          // If an employee changes the household (No approval needed)
+        } else {
+          household.members = householdForm.members;
+          household.vehicles = householdForm.vehicles;
+          household.ethnicity = householdForm.ethnicity;
+          household.tribe = householdForm.tribe;
+          household.sociostatus = householdForm.sociostatus;
+          household.nhtsno = householdForm.nhtsno;
+          household.watersource = householdForm.watersource;
+          household.toiletfacility = householdForm.toiletfacility;
+          household.address = householdForm.address;
         }
+        await household.save();
       }
+      // } else {
+      //   const newhousehold = await Household.findById(householdno);
+
+      //   const sameHousehold =
+      //     resident.householdno.toString() === newhousehold._id.toString();
+
+      //   if (sameHousehold) {
+      //     const currentRecord = newhousehold.members.find(
+      //       (m) => m.resID.toString() === resident._id.toString()
+      //     );
+      //     if (currentRecord.position !== householdposition) {
+      //       const memberIndex = newhousehold.members.findIndex(
+      //         (m) => m.resID.toString() === resident._id.toString()
+      //       );
+
+      //       if (memberIndex !== -1) {
+      //         const oldHousehold = newhousehold.toObject();
+      //         const { _id, ...rest } = oldHousehold;
+
+      //         newhousehold.members[memberIndex].position = householdposition;
+      //         if (!empID) {
+      //           const og = await ChangeHousehold.create({
+      //             ...rest,
+      //           });
+      //           newhousehold.status = "Change Requested";
+      //           newhousehold.changeID = og._id;
+      //         }
+
+      //         await newhousehold.save();
+      //       }
+      //     }
+      //   }
+      // }
     }
 
     if (empID) {
@@ -213,15 +226,15 @@ export const updateResident = async (req, res) => {
       });
     }
 
-    const oldResident = resident.toObject();
-    const { _id, ...rest } = oldResident;
+    // const oldResident = resident.toObject();
+    // const { _id, ...rest } = oldResident;
 
-    const og = await ChangeResident.create({
-      ...rest,
-    });
-    resident.status = "Change Requested";
-    resident.changeID = og._id;
-    await resident.save();
+    // const og = await ChangeResident.create({
+    //   ...rest,
+    // });
+    // resident.status = "Change Requested";
+    // resident.changeID = og._id;
+    // await resident.save();
 
     res.status(200).json({ message: "Resident successfully updated" });
   } catch (error) {
