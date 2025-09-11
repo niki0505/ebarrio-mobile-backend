@@ -244,6 +244,40 @@ export const updateResident = async (req, res) => {
             householdno &&
             householdno.toString() !== resident.householdno.toString()
           ) {
+            const otherActiveMembers = household.members.filter(
+              (mem) => mem.resID.toString() !== resident._id.toString()
+            );
+
+            let eligibleMembers = otherActiveMembers.filter(
+              (mem) => mem.resID.age >= 18
+            );
+
+            if (!eligibleMembers.length) eligibleMembers = otherActiveMembers;
+
+            if (eligibleMembers.length) {
+              // Pick oldest as new Head
+              const newHead = eligibleMembers.reduce((prev, curr) =>
+                curr.resID.age > prev.resID.age ? curr : prev
+              );
+
+              household.members = household.members.map((mem) => {
+                if (mem.resID.toString() === newHead.resID.toString()) {
+                  return { ...mem, position: "Head" };
+                }
+                return mem;
+              });
+
+              household.members = household.members.filter(
+                (mem) => mem.resID.toString() !== resident._id.toString()
+              );
+            } else {
+              // No eligible members → archive household
+              household.status = "Archived";
+            }
+            newHouse.members.push({
+              resID: resident._id,
+              position: updated.householdposition,
+            });
           } else if (
             householdno &&
             householdno.toString() === resident.householdno.toString()
