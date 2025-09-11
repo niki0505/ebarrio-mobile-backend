@@ -149,9 +149,11 @@ export const updateResident = async (req, res) => {
       if (isHead) {
         // Saves the new household to ChangeHousehold
         // If resident changes the household (Subject for approval)
+        const headMember = household.members.find((m) => m.position === "Head");
+
         if (!empID) {
           const updated = await ChangeHousehold.create({
-            members: householdForm.members,
+            members: [headMember, ...householdForm.members],
             vehicles: householdForm.vehicles,
             ethnicity: householdForm.ethnicity,
             tribe: householdForm.tribe,
@@ -214,14 +216,16 @@ export const updateResident = async (req, res) => {
 
     if (empID) {
       await ActivityLog.insertOne({
-        userID: userID,
-        action: "Residents",
+        userID,
+        action: "Update",
+        target: "Residents",
         description: `User updated their resident profile.`,
       });
     } else {
       await ActivityLog.insertOne({
-        userID: userID,
-        action: "Residents",
+        userID,
+        action: "Update",
+        target: "Residents",
         description: `User requested a change to their resident profile.`,
       });
     }
