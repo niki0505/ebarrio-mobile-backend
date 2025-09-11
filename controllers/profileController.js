@@ -253,82 +253,82 @@ export const updateResident = async (req, res) => {
         }
 
         await household.save();
-      }
-    } else {
-      // 🟢 Case C: Resident is NOT head and moving to another household
-      if (
-        householdno &&
-        householdno.toString() !== resident.householdno.toString()
-      ) {
-        if (!empID) {
-          const updated = await ChangeResident.create({
-            picture,
-            signature,
-            firstname,
-            middlename,
-            lastname,
-            suffix,
-            alias,
-            salutation,
-            sex,
-            gender,
-            birthdate,
-            age,
-            birthplace,
-            civilstatus,
-            bloodtype,
-            religion,
-            nationality,
-            voter,
-            precinct,
-            deceased,
-            email,
-            mobilenumber,
-            telephone,
-            facebook,
-            emergencyname,
-            emergencymobilenumber,
-            emergencyaddress,
-            HOAname,
-            employmentstatus,
-            occupation,
-            monthlyincome,
-            educationalattainment,
-            typeofschool,
-            course,
-            isSenior,
-            isInfant,
-            isNewborn,
-            isUnder5,
-            isSchoolAge,
-            isAdolescent,
-            isAdolescentPregnant,
-            isAdult,
-            isPostpartum,
-            isWomenOfReproductive,
-            isPWD,
-            isPregnant,
-            philhealthid,
-            philhealthtype,
-            philhealthcategory,
-            haveHypertension,
-            haveDiabetes,
-            haveTubercolosis,
-            haveSurgery,
-            lastmenstrual,
-            haveFPmethod,
-            fpmethod,
-            fpstatus,
-            householdno,
-            householdposition,
-            head,
-          });
-          resident.changeID = updated._id;
-          resident.status = "Change Requested";
-        } else {
-          // Employee override (non-head)
-          resident.householdno = householdno;
-          resident.householdposition = householdposition;
+      } else {
+        // 🟢 Case C: Resident is NOT head and moving to another household
+        if (
+          householdno &&
+          householdno.toString() !== resident.householdno.toString()
+        ) {
+          if (!empID) {
+            const updated = await ChangeResident.create({
+              picture,
+              signature,
+              firstname,
+              middlename,
+              lastname,
+              suffix,
+              alias,
+              salutation,
+              sex,
+              gender,
+              birthdate,
+              age,
+              birthplace,
+              civilstatus,
+              bloodtype,
+              religion,
+              nationality,
+              voter,
+              precinct,
+              deceased,
+              email,
+              mobilenumber,
+              telephone,
+              facebook,
+              emergencyname,
+              emergencymobilenumber,
+              emergencyaddress,
+              HOAname,
+              employmentstatus,
+              occupation,
+              monthlyincome,
+              educationalattainment,
+              typeofschool,
+              course,
+              isSenior,
+              isInfant,
+              isNewborn,
+              isUnder5,
+              isSchoolAge,
+              isAdolescent,
+              isAdolescentPregnant,
+              isAdult,
+              isPostpartum,
+              isWomenOfReproductive,
+              isPWD,
+              isPregnant,
+              philhealthid,
+              philhealthtype,
+              philhealthcategory,
+              haveHypertension,
+              haveDiabetes,
+              haveTubercolosis,
+              haveSurgery,
+              lastmenstrual,
+              haveFPmethod,
+              fpmethod,
+              fpstatus,
+              householdno,
+              householdposition,
+              head,
+            });
+            resident.changeID = updated._id;
+            resident.status = "Change Requested";
+          } else {
+            // Employee override (non-head)
+            resident.householdno = householdno;
+            resident.householdposition = householdposition;
+          }
         }
       }
     }
