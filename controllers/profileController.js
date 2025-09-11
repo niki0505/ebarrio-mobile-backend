@@ -256,27 +256,34 @@ export const updateResident = async (req, res) => {
               m.resID._id ? m.resID._id.toString() : m.resID.toString()
             );
 
-            // 1️⃣ Remove householdno for residents no longer in the household
-            for (const oldId of oldMemberIds) {
-              if (!newMemberIds.includes(oldId)) {
-                const resident = await Resident.findById(oldId);
-                if (resident) {
-                  resident.householdno = null;
-                  await resident.save();
+            const memberIdsChanged =
+              oldMemberIds.length !== newMemberIds.length ||
+              oldMemberIds.some((id) => !newMemberIds.includes(id));
+
+            if (memberIdsChanged) {
+              // Only then do the remove/add logic
+              for (const oldId of oldMemberIds) {
+                if (!newMemberIds.includes(oldId)) {
+                  const resident = await Resident.findById(oldId);
+                  if (resident) {
+                    resident.householdno = undefined;
+                    await resident.save();
+                  }
+                }
+              }
+
+              for (const newId of newMemberIds) {
+                if (!oldMemberIds.includes(newId)) {
+                  const resident = await Resident.findById(newId);
+                  if (resident) {
+                    resident.householdno = household._id;
+                    await resident.save();
+                  }
                 }
               }
             }
 
-            // 2️⃣ Assign householdno to new members
-            for (const newId of newMemberIds) {
-              if (!oldMemberIds.includes(newId)) {
-                const resident = await Resident.findById(newId);
-                if (resident) {
-                  resident.householdno = household._id;
-                  await resident.save();
-                }
-              }
-            }
+            // Update household fields no matter what
             household.members = householdForm.members;
             household.vehicles = householdForm.vehicles;
             household.ethnicity = householdForm.ethnicity;
