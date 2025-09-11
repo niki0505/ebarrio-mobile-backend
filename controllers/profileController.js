@@ -77,66 +77,6 @@ export const updateResident = async (req, res) => {
 
     const resident = await Resident.findById(resID);
 
-    if (empID) {
-      resident.picture = picture;
-      resident.signature = signature;
-      resident.firstname = firstname;
-      resident.middlename = middlename;
-      resident.lastname = lastname;
-      resident.suffix = suffix;
-      resident.alias = alias;
-      resident.salutation = salutation;
-      resident.sex = sex;
-      resident.gender = gender;
-      resident.birthdate = birthdate;
-      resident.age = age;
-      resident.birthplace = birthplace;
-      resident.civilstatus = civilstatus;
-      resident.bloodtype = bloodtype;
-      resident.religion = religion;
-      resident.nationality = nationality;
-      resident.voter = voter;
-      resident.precinct = precinct;
-      resident.deceased = deceased;
-      resident.email = email;
-      resident.mobilenumber = mobilenumber;
-      resident.telephone = telephone;
-      resident.facebook = facebook;
-      resident.emergencyname = emergencyname;
-      resident.emergencymobilenumber = emergencymobilenumber;
-      resident.emergencyaddress = emergencyaddress;
-      resident.HOAname = HOAname;
-      resident.employmentstatus = employmentstatus;
-      resident.occupation = occupation;
-      resident.monthlyincome = monthlyincome;
-      resident.educationalattainment = educationalattainment;
-      resident.typeofschool = typeofschool;
-      resident.course = course;
-      resident.isSenior = isSenior;
-      resident.isInfant = isInfant;
-      resident.isNewborn = isNewborn;
-      resident.isUnder5 = isUnder5;
-      resident.isSchoolAge = isSchoolAge;
-      resident.isAdolescent = isAdolescent;
-      resident.isAdolescentPregnant = isAdolescentPregnant;
-      resident.isAdult = isAdult;
-      resident.isPostpartum = isPostpartum;
-      resident.isWomenOfReproductive = isWomenOfReproductive;
-      resident.isPWD = isPWD;
-      resident.isPregnant = isPregnant;
-      resident.philhealthid = philhealthid;
-      resident.philhealthtype = philhealthtype;
-      resident.philhealthcategory = philhealthcategory;
-      resident.haveHypertension = haveHypertension;
-      resident.haveDiabetes = haveDiabetes;
-      resident.haveTubercolosis = haveTubercolosis;
-      resident.haveSurgery = haveSurgery;
-      resident.lastmenstrual = lastmenstrual;
-      resident.haveFPmethod = haveFPmethod;
-      resident.fpmethod = fpmethod;
-      resident.fpstatus = fpstatus;
-    }
-
     const household = await Household.findById(resident.householdno);
 
     // If the resident has chosen household
@@ -663,6 +603,66 @@ export const updateResident = async (req, res) => {
           }
         }
       }
+    }
+
+    if (empID) {
+      resident.picture = picture;
+      resident.signature = signature;
+      resident.firstname = firstname;
+      resident.middlename = middlename;
+      resident.lastname = lastname;
+      resident.suffix = suffix;
+      resident.alias = alias;
+      resident.salutation = salutation;
+      resident.sex = sex;
+      resident.gender = gender;
+      resident.birthdate = birthdate;
+      resident.age = age;
+      resident.birthplace = birthplace;
+      resident.civilstatus = civilstatus;
+      resident.bloodtype = bloodtype;
+      resident.religion = religion;
+      resident.nationality = nationality;
+      resident.voter = voter;
+      resident.precinct = precinct;
+      resident.deceased = deceased;
+      resident.email = email;
+      resident.mobilenumber = mobilenumber;
+      resident.telephone = telephone;
+      resident.facebook = facebook;
+      resident.emergencyname = emergencyname;
+      resident.emergencymobilenumber = emergencymobilenumber;
+      resident.emergencyaddress = emergencyaddress;
+      resident.HOAname = HOAname;
+      resident.employmentstatus = employmentstatus;
+      resident.occupation = occupation;
+      resident.monthlyincome = monthlyincome;
+      resident.educationalattainment = educationalattainment;
+      resident.typeofschool = typeofschool;
+      resident.course = course;
+      resident.isSenior = isSenior;
+      resident.isInfant = isInfant;
+      resident.isNewborn = isNewborn;
+      resident.isUnder5 = isUnder5;
+      resident.isSchoolAge = isSchoolAge;
+      resident.isAdolescent = isAdolescent;
+      resident.isAdolescentPregnant = isAdolescentPregnant;
+      resident.isAdult = isAdult;
+      resident.isPostpartum = isPostpartum;
+      resident.isWomenOfReproductive = isWomenOfReproductive;
+      resident.isPWD = isPWD;
+      resident.isPregnant = isPregnant;
+      resident.philhealthid = philhealthid;
+      resident.philhealthtype = philhealthtype;
+      resident.philhealthcategory = philhealthcategory;
+      resident.haveHypertension = haveHypertension;
+      resident.haveDiabetes = haveDiabetes;
+      resident.haveTubercolosis = haveTubercolosis;
+      resident.haveSurgery = haveSurgery;
+      resident.lastmenstrual = lastmenstrual;
+      resident.haveFPmethod = haveFPmethod;
+      resident.fpmethod = fpmethod;
+      resident.fpstatus = fpstatus;
     }
 
     await resident.save();
