@@ -540,7 +540,17 @@ export const updateResident = async (req, res) => {
                 resident.status = "Change Requested";
               } else {
                 // Employee override (directly update position)
-                resident.householdposition = householdposition;
+                household.members = household.members.map((m) => {
+                  if (m.resID.toString() === resident._id.toString()) {
+                    return {
+                      ...(m.toObject ? m.toObject() : m),
+                      position: householdposition,
+                    };
+                  }
+                  return m;
+                });
+
+                await household.save();
               }
             }
           }
