@@ -374,8 +374,25 @@ export const updateResident = async (req, res) => {
               resident.status = "Change Requested";
             } else {
               // Employee override (non-head)
+              const newHousehold = await Household.findById(householdno);
+              if (newHousehold) {
+                newHousehold.members.push({
+                  resID: resident._id,
+                  position: householdposition,
+                });
+                await newHousehold.save();
+              }
+
+              const oldHousehold = await Household.findById(
+                resident.householdno
+              );
+              if (oldHousehold) {
+                oldHousehold.members = oldHousehold.members.filter(
+                  (m) => m.resID.toString() !== resident._id.toString()
+                );
+                await oldHousehold.save();
+              }
               resident.householdno = householdno;
-              resident.householdposition = householdposition;
             }
           } else {
             let members = [...householdForm.members];
