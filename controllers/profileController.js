@@ -146,15 +146,15 @@ export const updateResident = async (req, res) => {
           member.position === "Head"
       );
 
-      // If the resident is Head
       if (isHead) {
-        // Saves the new household to ChangeHousehold
-        // If resident changes the household (Subject for approval)
         const headMember = household.members.find((m) => m.position === "Head");
 
         if (!empID) {
-          // Head moves to another household
-          if (householdno.toString() !== resident.householdno.toString()) {
+          // ✅ Case A: Head is moving OUT of this household
+          if (
+            householdno &&
+            householdno.toString() !== resident.householdno.toString()
+          ) {
             const updated = await ChangeResident.create({
               picture,
               signature,
@@ -218,8 +218,12 @@ export const updateResident = async (req, res) => {
             });
             resident.changeID = updated._id;
             resident.status = "Change Requested";
-          } else {
-            // Head staying, update household info
+          }
+          // ✅ Case B: Head is staying in the same household
+          else if (
+            householdno &&
+            householdno.toString() === resident.householdno.toString()
+          ) {
             const updated = await ChangeHousehold.create({
               members: [headMember, ...householdForm.members],
               vehicles: householdForm.vehicles,
@@ -235,7 +239,7 @@ export const updateResident = async (req, res) => {
             household.change.push({ changeID: updated._id });
           }
         } else {
-          // If an employee changes the household (No approval needed)
+          // Employee override
           household.members = householdForm.members;
           household.vehicles = householdForm.vehicles;
           household.ethnicity = householdForm.ethnicity;
@@ -246,13 +250,9 @@ export const updateResident = async (req, res) => {
           household.toiletfacility = householdForm.toiletfacility;
           household.address = householdForm.address;
         }
+
         await household.save();
       }
-      // } else {
-      //   if (!empID) {
-
-      //   }
-      // }
     }
 
     await resident.save();
