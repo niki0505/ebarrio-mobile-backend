@@ -169,9 +169,7 @@ export const updateResident = async (req, res) => {
             changePayload.householdno = householdno;
             changePayload.householdposition = householdposition;
             changePayload.head = head;
-          }
-          // ✅ Case B: Head is staying in the same household
-          else if (
+          } else if (
             householdno &&
             householdno.toString() === resident.householdno.toString()
           ) {
@@ -185,11 +183,59 @@ export const updateResident = async (req, res) => {
 
             const normalizeArray = (arr) => (arr || []).map(String).sort();
 
+            const oldMembers = normalizeMembers(household.members);
+            const newMembers = normalizeMembers(householdForm.members);
+
+            const oldVehicles = normalizeArray(household.vehicles);
+            const newVehicles = normalizeArray(householdForm.vehicles);
+
+            console.log("🔎 Debug Household Comparison:");
+            console.log("Members (DB):", JSON.stringify(oldMembers, null, 2));
+            console.log("Members (Form):", JSON.stringify(newMembers, null, 2));
+            console.log("Vehicles (DB):", JSON.stringify(oldVehicles, null, 2));
+            console.log(
+              "Vehicles (Form):",
+              JSON.stringify(newVehicles, null, 2)
+            );
+            console.log(
+              "Ethnicity DB vs Form:",
+              household.ethnicity,
+              householdForm.ethnicity
+            );
+            console.log(
+              "Tribe DB vs Form:",
+              household.tribe,
+              householdForm.tribe
+            );
+            console.log(
+              "Socio DB vs Form:",
+              household.sociostatus,
+              householdForm.sociostatus
+            );
+            console.log(
+              "NHTS DB vs Form:",
+              household.nhtsno,
+              householdForm.nhtsno
+            );
+            console.log(
+              "Water DB vs Form:",
+              household.watersource,
+              householdForm.watersource
+            );
+            console.log(
+              "Toilet DB vs Form:",
+              household.toiletfacility,
+              householdForm.toiletfacility
+            );
+            console.log(
+              "Address DB vs Form:",
+              household.address,
+              householdForm.address
+            );
+
             const hasHouseholdChanges =
-              JSON.stringify(normalizeMembers(household.members)) !==
-                JSON.stringify(normalizeMembers(householdForm.members)) ||
-              JSON.stringify(normalizeArray(household.vehicles)) !==
-                JSON.stringify(normalizeArray(householdForm.vehicles)) ||
+              JSON.stringify(oldMembers) !== JSON.stringify(newMembers) ||
+              JSON.stringify(oldVehicles) !== JSON.stringify(newVehicles) ||
               (household.ethnicity || "") !== (householdForm.ethnicity || "") ||
               (household.tribe || "") !== (householdForm.tribe || "") ||
               (household.sociostatus || "") !==
@@ -200,6 +246,9 @@ export const updateResident = async (req, res) => {
               (household.toiletfacility || "") !==
                 (householdForm.toiletfacility || "") ||
               (household.address || "") !== (householdForm.address || "");
+
+            console.log("➡️ hasHouseholdChanges:", hasHouseholdChanges);
+
             if (hasHouseholdChanges) {
               const updated = await ChangeHousehold.create({
                 members: [headMember, ...householdForm.members],
@@ -214,6 +263,12 @@ export const updateResident = async (req, res) => {
               });
               household.status = "Change Requested";
               household.change.push({ changeID: updated._id });
+
+              console.log("✅ ChangeHousehold created:", updated._id);
+            } else {
+              console.log(
+                "🚫 No household changes detected. Skipping ChangeHousehold creation."
+              );
             }
           }
         } else {
