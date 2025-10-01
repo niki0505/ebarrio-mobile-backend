@@ -515,13 +515,13 @@ export const updateResident = async (req, res) => {
       }
     }
 
-    await resident.save();
-
     if (!empID && Object.keys(changePayload).length > 0) {
       const updated = await ChangeResident.create(changePayload);
       resident.changeID = updated._id;
       resident.status = "Change Requested";
     }
+
+    await resident.save();
 
     if (empID) {
       await ActivityLog.insertOne({
