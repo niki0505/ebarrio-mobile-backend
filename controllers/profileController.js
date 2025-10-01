@@ -175,6 +175,7 @@ export const updateResident = async (req, res) => {
           ) {
             const normalizeMembers = (members) =>
               members
+                .filter((m) => m.position !== "Head")
                 .map((m) => ({
                   resID: m.resID.toString(),
                   position: m.position,
