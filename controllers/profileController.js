@@ -175,19 +175,43 @@ export const updateResident = async (req, res) => {
             householdno &&
             householdno.toString() === resident.householdno.toString()
           ) {
-            const updated = await ChangeHousehold.create({
-              members: [headMember, ...householdForm.members],
-              vehicles: householdForm.vehicles,
-              ethnicity: householdForm.ethnicity,
-              tribe: householdForm.tribe,
-              sociostatus: householdForm.sociostatus,
-              nhtsno: householdForm.nhtsno,
-              watersource: householdForm.watersource,
-              toiletfacility: householdForm.toiletfacility,
-              address: householdForm.address,
-            });
-            household.status = "Change Requested";
-            household.change.push({ changeID: updated._id });
+            const hasChanges =
+              JSON.stringify(
+                household.members.map((m) => ({
+                  resID: m.resID.toString(),
+                  position: m.position,
+                }))
+              ) !==
+                JSON.stringify(
+                  householdForm.members.map((m) => ({
+                    resID: m.resID.toString(),
+                    position: m.position,
+                  }))
+                ) ||
+              household.vehicles.toString() !==
+                householdForm.vehicles.toString() ||
+              household.ethnicity !== householdForm.ethnicity ||
+              household.tribe !== householdForm.tribe ||
+              household.sociostatus !== householdForm.sociostatus ||
+              household.nhtsno !== householdForm.nhtsno ||
+              household.watersource !== householdForm.watersource ||
+              household.toiletfacility !== householdForm.toiletfacility ||
+              household.address !== householdForm.address;
+            if (hasChanges) {
+              const updated = await ChangeHousehold.create({
+                members: [headMember, ...householdForm.members],
+                vehicles: householdForm.vehicles,
+                ethnicity: householdForm.ethnicity,
+                tribe: householdForm.tribe,
+                sociostatus: householdForm.sociostatus,
+                nhtsno: householdForm.nhtsno,
+                watersource: householdForm.watersource,
+                toiletfacility: householdForm.toiletfacility,
+                address: householdForm.address,
+              });
+              household.status = "Change Requested";
+              household.change.push({ changeID: updated._id });
+            }
           }
         } else {
           if (
