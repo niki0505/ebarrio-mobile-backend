@@ -177,7 +177,7 @@ export const updateResident = async (req, res) => {
               members
                 .filter((m) => m.position !== "Head")
                 .map((m) => ({
-                  resID: m.resID.toString(),
+                  resID: (m.resID?._id || m.resID)?.toString(),
                   position: m.position,
                 }))
                 .sort((a, b) => a.resID.localeCompare(b.resID)); // prevent order mismatch
