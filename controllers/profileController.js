@@ -79,6 +79,76 @@ export const updateResident = async (req, res) => {
 
     const household = await Household.findById(resident.householdno);
 
+    const personalPayload = {
+      picture,
+      signature,
+      firstname,
+      middlename,
+      lastname,
+      suffix,
+      alias,
+      salutation,
+      sex,
+      gender,
+      birthdate,
+      age,
+      birthplace,
+      civilstatus,
+      bloodtype,
+      religion,
+      nationality,
+      voter,
+      precinct,
+      deceased,
+      email,
+      mobilenumber,
+      telephone,
+      facebook,
+      emergencyname,
+      emergencymobilenumber,
+      emergencyaddress,
+      HOAname,
+      employmentstatus,
+      occupation,
+      monthlyincome,
+      educationalattainment,
+      typeofschool,
+      course,
+      isSenior,
+      isInfant,
+      isNewborn,
+      isUnder5,
+      isSchoolAge,
+      isAdolescent,
+      isAdolescentPregnant,
+      isAdult,
+      isPostpartum,
+      isWomenOfReproductive,
+      isPWD,
+      isPregnant,
+      philhealthid,
+      philhealthtype,
+      philhealthcategory,
+      haveHypertension,
+      haveDiabetes,
+      haveTubercolosis,
+      haveSurgery,
+      lastmenstrual,
+      haveFPmethod,
+      fpmethod,
+      fpstatus,
+      householdno,
+      householdposition,
+      head,
+    };
+    let changePayload = {};
+
+    if (empID) {
+      Object.assign(resident, personalPayload);
+    } else {
+      Object.assign(changePayload, personalPayload);
+    }
+
     // If the resident has chosen household
     if (household) {
       const isHead = household?.members?.some(
@@ -96,70 +166,9 @@ export const updateResident = async (req, res) => {
             householdno &&
             householdno.toString() !== resident.householdno.toString()
           ) {
-            const updated = await ChangeResident.create({
-              picture,
-              signature,
-              firstname,
-              middlename,
-              lastname,
-              suffix,
-              alias,
-              salutation,
-              sex,
-              gender,
-              birthdate,
-              age,
-              birthplace,
-              civilstatus,
-              bloodtype,
-              religion,
-              nationality,
-              voter,
-              precinct,
-              deceased,
-              email,
-              mobilenumber,
-              telephone,
-              facebook,
-              emergencyname,
-              emergencymobilenumber,
-              emergencyaddress,
-              HOAname,
-              employmentstatus,
-              occupation,
-              monthlyincome,
-              educationalattainment,
-              typeofschool,
-              course,
-              isSenior,
-              isInfant,
-              isNewborn,
-              isUnder5,
-              isSchoolAge,
-              isAdolescent,
-              isAdolescentPregnant,
-              isAdult,
-              isPostpartum,
-              isWomenOfReproductive,
-              isPWD,
-              isPregnant,
-              philhealthid,
-              philhealthtype,
-              philhealthcategory,
-              haveHypertension,
-              haveDiabetes,
-              haveTubercolosis,
-              haveSurgery,
-              lastmenstrual,
-              haveFPmethod,
-              fpmethod,
-              fpstatus,
-              householdno,
-              householdposition,
-              head,
-            });
-            resident.changeID = updated._id;
-            resident.status = "Change Requested";
+            changePayload.householdno = householdno;
+            changePayload.householdposition = householdposition;
+            changePayload.head = head;
           }
           // ✅ Case B: Head is staying in the same household
           else if (
@@ -286,70 +295,9 @@ export const updateResident = async (req, res) => {
         if (householdno) {
           if (householdno.toString() !== resident.householdno.toString()) {
             if (!empID) {
-              const updated = await ChangeResident.create({
-                picture,
-                signature,
-                firstname,
-                middlename,
-                lastname,
-                suffix,
-                alias,
-                salutation,
-                sex,
-                gender,
-                birthdate,
-                age,
-                birthplace,
-                civilstatus,
-                bloodtype,
-                religion,
-                nationality,
-                voter,
-                precinct,
-                deceased,
-                email,
-                mobilenumber,
-                telephone,
-                facebook,
-                emergencyname,
-                emergencymobilenumber,
-                emergencyaddress,
-                HOAname,
-                employmentstatus,
-                occupation,
-                monthlyincome,
-                educationalattainment,
-                typeofschool,
-                course,
-                isSenior,
-                isInfant,
-                isNewborn,
-                isUnder5,
-                isSchoolAge,
-                isAdolescent,
-                isAdolescentPregnant,
-                isAdult,
-                isPostpartum,
-                isWomenOfReproductive,
-                isPWD,
-                isPregnant,
-                philhealthid,
-                philhealthtype,
-                philhealthcategory,
-                haveHypertension,
-                haveDiabetes,
-                haveTubercolosis,
-                haveSurgery,
-                lastmenstrual,
-                haveFPmethod,
-                fpmethod,
-                fpstatus,
-                householdno,
-                householdposition,
-                head,
-              });
-              resident.changeID = updated._id;
-              resident.status = "Change Requested";
+              changePayload.householdno = householdno;
+              changePayload.householdposition = householdposition;
+              changePayload.head = head;
             } else {
               // Employee override (non-head)
               const newHousehold = await Household.findById(householdno);
@@ -387,69 +335,9 @@ export const updateResident = async (req, res) => {
                 });
                 newhousehold.status = "Pending";
                 await newhousehold.save();
-                const updated = await ChangeResident.create({
-                  picture,
-                  signature,
-                  firstname,
-                  middlename,
-                  lastname,
-                  suffix,
-                  alias,
-                  salutation,
-                  sex,
-                  gender,
-                  birthdate,
-                  age,
-                  birthplace,
-                  civilstatus,
-                  bloodtype,
-                  religion,
-                  nationality,
-                  voter,
-                  precinct,
-                  deceased,
-                  email,
-                  mobilenumber,
-                  telephone,
-                  facebook,
-                  emergencyname,
-                  emergencymobilenumber,
-                  emergencyaddress,
-                  HOAname,
-                  employmentstatus,
-                  occupation,
-                  monthlyincome,
-                  educationalattainment,
-                  typeofschool,
-                  course,
-                  isSenior,
-                  isInfant,
-                  isNewborn,
-                  isUnder5,
-                  isSchoolAge,
-                  isAdolescent,
-                  isAdolescentPregnant,
-                  isAdult,
-                  isPostpartum,
-                  isWomenOfReproductive,
-                  isPWD,
-                  isPregnant,
-                  philhealthid,
-                  philhealthtype,
-                  philhealthcategory,
-                  haveHypertension,
-                  haveDiabetes,
-                  haveTubercolosis,
-                  haveSurgery,
-                  lastmenstrual,
-                  haveFPmethod,
-                  fpmethod,
-                  fpstatus,
-                  householdno: newhousehold._id,
-                  head,
-                });
-                resident.changeID = updated._id;
-                resident.status = "Change Requested";
+
+                changePayload.householdno = newhousehold._id;
+                changePayload.head = head;
               } else {
                 members.push({
                   resID: resident._id,
@@ -521,70 +409,9 @@ export const updateResident = async (req, res) => {
             } else {
               // Resident stays in the SAME household → only position changes
               if (!empID) {
-                const updated = await ChangeResident.create({
-                  picture,
-                  signature,
-                  firstname,
-                  middlename,
-                  lastname,
-                  suffix,
-                  alias,
-                  salutation,
-                  sex,
-                  gender,
-                  birthdate,
-                  age,
-                  birthplace,
-                  civilstatus,
-                  bloodtype,
-                  religion,
-                  nationality,
-                  voter,
-                  precinct,
-                  deceased,
-                  email,
-                  mobilenumber,
-                  telephone,
-                  facebook,
-                  emergencyname,
-                  emergencymobilenumber,
-                  emergencyaddress,
-                  HOAname,
-                  employmentstatus,
-                  occupation,
-                  monthlyincome,
-                  educationalattainment,
-                  typeofschool,
-                  course,
-                  isSenior,
-                  isInfant,
-                  isNewborn,
-                  isUnder5,
-                  isSchoolAge,
-                  isAdolescent,
-                  isAdolescentPregnant,
-                  isAdult,
-                  isPostpartum,
-                  isWomenOfReproductive,
-                  isPWD,
-                  isPregnant,
-                  philhealthid,
-                  philhealthtype,
-                  philhealthcategory,
-                  haveHypertension,
-                  haveDiabetes,
-                  haveTubercolosis,
-                  haveSurgery,
-                  lastmenstrual,
-                  haveFPmethod,
-                  fpmethod,
-                  fpstatus,
-                  householdno,
-                  householdposition,
-                  head,
-                });
-                resident.changeID = updated._id;
-                resident.status = "Change Requested";
+                changePayload.householdno = householdno;
+                changePayload.householdposition = householdposition;
+                changePayload.head = head;
               } else {
                 // Employee override (directly update position)
                 household.members = household.members.map((m) => {
@@ -605,67 +432,13 @@ export const updateResident = async (req, res) => {
       }
     }
 
-    if (empID) {
-      resident.picture = picture;
-      resident.signature = signature;
-      resident.firstname = firstname;
-      resident.middlename = middlename;
-      resident.lastname = lastname;
-      resident.suffix = suffix;
-      resident.alias = alias;
-      resident.salutation = salutation;
-      resident.sex = sex;
-      resident.gender = gender;
-      resident.birthdate = birthdate;
-      resident.age = age;
-      resident.birthplace = birthplace;
-      resident.civilstatus = civilstatus;
-      resident.bloodtype = bloodtype;
-      resident.religion = religion;
-      resident.nationality = nationality;
-      resident.voter = voter;
-      resident.precinct = precinct;
-      resident.deceased = deceased;
-      resident.email = email;
-      resident.mobilenumber = mobilenumber;
-      resident.telephone = telephone;
-      resident.facebook = facebook;
-      resident.emergencyname = emergencyname;
-      resident.emergencymobilenumber = emergencymobilenumber;
-      resident.emergencyaddress = emergencyaddress;
-      resident.HOAname = HOAname;
-      resident.employmentstatus = employmentstatus;
-      resident.occupation = occupation;
-      resident.monthlyincome = monthlyincome;
-      resident.educationalattainment = educationalattainment;
-      resident.typeofschool = typeofschool;
-      resident.course = course;
-      resident.isSenior = isSenior;
-      resident.isInfant = isInfant;
-      resident.isNewborn = isNewborn;
-      resident.isUnder5 = isUnder5;
-      resident.isSchoolAge = isSchoolAge;
-      resident.isAdolescent = isAdolescent;
-      resident.isAdolescentPregnant = isAdolescentPregnant;
-      resident.isAdult = isAdult;
-      resident.isPostpartum = isPostpartum;
-      resident.isWomenOfReproductive = isWomenOfReproductive;
-      resident.isPWD = isPWD;
-      resident.isPregnant = isPregnant;
-      resident.philhealthid = philhealthid;
-      resident.philhealthtype = philhealthtype;
-      resident.philhealthcategory = philhealthcategory;
-      resident.haveHypertension = haveHypertension;
-      resident.haveDiabetes = haveDiabetes;
-      resident.haveTubercolosis = haveTubercolosis;
-      resident.haveSurgery = haveSurgery;
-      resident.lastmenstrual = lastmenstrual;
-      resident.haveFPmethod = haveFPmethod;
-      resident.fpmethod = fpmethod;
-      resident.fpstatus = fpstatus;
-    }
-
     await resident.save();
+
+    if (!empID && Object.keys(changePayload).length > 0) {
+      const updated = await ChangeResident.create(changePayload);
+      resident.changeID = updated._id;
+      resident.status = "Change Requested";
+    }
 
     if (empID) {
       await ActivityLog.insertOne({
