@@ -175,29 +175,32 @@ export const updateResident = async (req, res) => {
             householdno &&
             householdno.toString() === resident.householdno.toString()
           ) {
-            const hasChanges =
-              JSON.stringify(
-                household.members.map((m) => ({
+            const normalizeMembers = (members) =>
+              members
+                .map((m) => ({
                   resID: m.resID.toString(),
                   position: m.position,
                 }))
-              ) !==
-                JSON.stringify(
-                  householdForm.members.map((m) => ({
-                    resID: m.resID.toString(),
-                    position: m.position,
-                  }))
-                ) ||
-              household.vehicles.toString() !==
-                householdForm.vehicles.toString() ||
-              household.ethnicity !== householdForm.ethnicity ||
-              household.tribe !== householdForm.tribe ||
-              household.sociostatus !== householdForm.sociostatus ||
-              household.nhtsno !== householdForm.nhtsno ||
-              household.watersource !== householdForm.watersource ||
-              household.toiletfacility !== householdForm.toiletfacility ||
-              household.address !== householdForm.address;
-            if (hasChanges) {
+                .sort((a, b) => a.resID.localeCompare(b.resID)); // prevent order mismatch
+
+            const normalizeArray = (arr) => (arr || []).map(String).sort();
+
+            const hasHouseholdChanges =
+              JSON.stringify(normalizeMembers(household.members)) !==
+                JSON.stringify(normalizeMembers(householdForm.members)) ||
+              JSON.stringify(normalizeArray(household.vehicles)) !==
+                JSON.stringify(normalizeArray(householdForm.vehicles)) ||
+              (household.ethnicity || "") !== (householdForm.ethnicity || "") ||
+              (household.tribe || "") !== (householdForm.tribe || "") ||
+              (household.sociostatus || "") !==
+                (householdForm.sociostatus || "") ||
+              (household.nhtsno || "") !== (householdForm.nhtsno || "") ||
+              (household.watersource || "") !==
+                (householdForm.watersource || "") ||
+              (household.toiletfacility || "") !==
+                (householdForm.toiletfacility || "") ||
+              (household.address || "") !== (householdForm.address || "");
+            if (hasHouseholdChanges) {
               const updated = await ChangeHousehold.create({
                 members: [headMember, ...householdForm.members],
                 vehicles: householdForm.vehicles,
