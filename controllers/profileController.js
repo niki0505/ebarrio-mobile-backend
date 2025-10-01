@@ -138,8 +138,6 @@ export const updateResident = async (req, res) => {
       fpmethod,
       fpstatus,
       householdno,
-      householdposition,
-      head,
     };
     let changePayload = {};
 
