@@ -37,6 +37,7 @@ import {
 import { sendBlotter } from "../controllers/blotterController.js";
 import { getWeather } from "../controllers/weatherController.js";
 import {
+  createHouseholdResident,
   createResident,
   getAllResidents,
 } from "../controllers/residentsController.js";
@@ -189,6 +190,7 @@ router.get("/getunreadnotifications", authMiddleware, unreadNotifications);
 
 //RESIDENTS FORM
 router.post("/createresident", createResident);
+router.post("/household/createresident", createHouseholdResident);
 router.get("/gethouseholds", getAllHousehold);
 
 //SNAPSHOTS
