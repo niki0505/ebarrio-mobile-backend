@@ -276,9 +276,12 @@ export const createResident = async (req, res) => {
       household.status = "Pending";
       await household.save();
 
-      await Resident.findByIdAndUpdate(resident._id, {
-        householdno: household._id,
-      });
+      const memberIDs = members.map((m) => m.resID);
+
+      await Resident.updateMany(
+        { _id: { $in: memberIDs } },
+        { householdno: household._id }
+      );
     } else if (head === "No") {
       if (householdno && householdposition) {
         const household = await Household.findById(householdno);
